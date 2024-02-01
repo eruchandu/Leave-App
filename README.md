@@ -1,7 +1,6 @@
 # Leave-App
 1. Introduction :
-
-The Staff Leave Application is a web-based system designed to simplify the leave application process for employees within an organization. This application allows employees to submit leave requests with accompanying messages, and managers, acting as administrators, can review, accept, or reject these requests. The leave status remains pending until a decision is made by the manager.
+	The Staff Leave Application is a web-based system designed to simplify the leave application process for employees within an organization. This application allows employees to 	submit leave requests with accompanying messages, and managers, acting as administrators, can review, accept, or reject these requests. The leave status remains pending until a 	decision is made by the manager.
 
 2. Features
 
