@@ -1,0 +1,21 @@
+.col-md-3{
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.employees {
+    flex: 1; /* Ensure equal width for each column */
+    margin: 0 10px; /* Adjust spacing between columns */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    max-width: 500px;
+
+  }
+  .employees:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  }
+ 
