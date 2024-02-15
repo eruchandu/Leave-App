@@ -52,7 +52,7 @@ React
  
  	react-icons
 	
-Frontend i have Written components and i made Api calls to the Server which return me data and i REndered on the Browswer 
+Frontend i have Written components and i made Api calls to the Server which returned me data and i REndered on the Browswer 
 
     Home page  (landing page)
     Login page  ->   post request for login  i.e localhost:3500/   => if yes -> /employee page else HOmepage
