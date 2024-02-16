@@ -18,7 +18,7 @@ function Employees()
     setShowModal(true);
   };
   const handleDelete=async (employee)=>{
-    axios.post(`{SERVER}/employees/del`,employee,{ withCredentials: true })
+    axios.post(`${SERVER}/employees/del`,employee,{ withCredentials: true })
     .then(res => {
         setUsers([])
         console.log(res)
@@ -33,7 +33,7 @@ function Employees()
 
    async function getData()
     {
-        let res=await axios.post(`{SERVER}/employees`,user,{ withCredentials: true })
+        let res=await axios.post(`${SERVER}/employees`,user,{ withCredentials: true })
         setUsers(res.data.content)
     }
 

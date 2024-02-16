@@ -31,7 +31,7 @@ function ApplyLeave(props)
     {
       const obj=
       {empid:user.empid}
-      axios.post(`{SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
+      axios.post(`${SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
            toast.error(resp.data.message);
@@ -90,7 +90,7 @@ function ApplyLeave(props)
         //     status:'pending'
         // }
         //const obj={...leave,...ob};
-         axios.post(`{SERVER}/apply`,
+         axios.post(`${SERVER}/apply`,
            formData,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {

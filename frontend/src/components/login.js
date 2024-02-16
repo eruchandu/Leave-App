@@ -4,8 +4,7 @@ import axios from 'axios';
 import AuthContext from '../contexts/AuthContext.js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import SERVER from '../applink.js'
 function Login(){
   let [User,SetUser]=useState({empid:'',password:''});
 
