@@ -63,7 +63,7 @@ const verifyToken = (req, res, next) =>
 
 app.post('/', async (req,res)=>{
   //console.log(req.headers)
-   console.log("post method called ",req.body.empid+" "+req.body.password);
+   //console.log("post method called ",req.body.empid+" "+req.body.password);
     let result=await userModel.findOne({empid:req.body.empid});
     if(result)
     {
@@ -128,9 +128,9 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
       const newLeave=new leaveModel(obj);
       let resp=await newLeave.save();
       const diff=daysDifference(obj.from,obj.to);
-      console.log("Applied no of leaves ",diff)
+      //console.log("Applied no of leaves ",diff)
       let answer = await userModel.findOneAndUpdate( { empid: obj.empid },{$inc: {pending: diff }  },{ new: true } );
-      console.log("Applied leaved modified ",answer)
+     // console.log("Applied leaved modified ",answer)
       res.send({success:true,message:"Leave Applied"})
     }
     else
@@ -150,9 +150,9 @@ app.post('/approval', verifyToken,async(req,res)=>{
   const id=req.body.empid;
 
    //const approvals=templeave.filter((item,ind)=>(item.head==id&&item.status=='pending'))
-   console.log("Approvals called",id)
+   //console.log("Approvals called",id)
  const approvals=await leaveModel.find({head:id,status:'pending'})
-     console.log("approvals",approvals);
+    // console.log("approvals",approvals);
     res.send({success:true,content:approvals})
 })
 
@@ -185,7 +185,7 @@ app.post('/revoke',verifyToken,async (req,res)=>{
 
 
 app.post('/employees',verifyToken,async(req,res)=>{
-  console.log("Employee  List Called")
+//  console.log("Employee  List Called")
   const id=req.body.empid;
   console.log("id   ",id);
   userModel.find({head:id })
@@ -199,7 +199,7 @@ app.post('/employees',verifyToken,async(req,res)=>{
          Address: item.Address,
          total: item.total
        }));
-       console.log("Server Side ",extractedUsers);
+      // console.log("Server Side ",extractedUsers);
        res.send({success:true,content:extractedUsers,message:'Employees of your team'})
      })
      .catch(error => {
@@ -208,9 +208,9 @@ app.post('/employees',verifyToken,async(req,res)=>{
      });
  })
  app.post('/employees/del',verifyToken,(req,res)=>{
-   console.log("Employee Delete Called ");
+  // console.log("Employee Delete Called ");
    const{empid}=req.body
-   console.log(empid);
+   //console.log(empid);
   userModel.findOneAndUpdate(
     { empid: empid }, 
     { $set: {head:''} }
@@ -220,12 +220,12 @@ app.post('/employees',verifyToken,async(req,res)=>{
 })
 app.post('/employees/list',verifyToken,(req,res)=>{
   const{role}=req.body
-  console.log(role);
+ // console.log(role);
   
  userModel.find({role:role,head:''})
  .then(async(updatedUsers) => 
    {
-  console.log(updatedUsers);
+ // console.log(updatedUsers);
   if(updatedUsers.length>0)
   res.send({success:true,content:updatedUsers,message:`Unassigned ${role}`});
   else
@@ -237,7 +237,7 @@ app.post('/employees/list',verifyToken,(req,res)=>{
 app.post('/employees/add',verifyToken,async(req,res)=>{
 
   const{empid,name,role,head}=req.body
-  console.log(empid);
+ // console.log(empid);
   const emp=await userModel.findOne({empid:empid});
   if(emp.head!=="")
   {
@@ -290,7 +290,7 @@ app.post('/getleaves',verifyToken,async(req,res)=>{
   const {empid}=req.body;
  
   let result=await userModel.find({empid:empid});
- console.log("Result = ",result);
+ //console.log("Result = ",result);
   res.send({success:true,message:"get leaves",content:result});
 
 })
@@ -298,7 +298,7 @@ app.post('/approving', verifyToken ,async (req,res)=>{
   let id=req.body.empid;
   let date=req.body.from;
   let message=req.body.update;
-  console.log("Approving called");
+  //console.log("Approving called");
   leaveModel.findOneAndUpdate(
     { empid: id, from: date, status: 'pending' }, 
     { $set: { status: message } }, 
@@ -309,7 +309,7 @@ app.post('/approving', verifyToken ,async (req,res)=>{
      //console.log('Leave document updated successfully:', updatedLeave);
      console.log("Leave update",updatedLeave.from,"   ",updatedLeave.to)
      const diff=daysDifference(updatedLeave.from,updatedLeave.to);
-     console.log(diff);
+    // console.log(diff);
      let obj={};
        if(message==='Grant')
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {granted: diff, pending: -diff }  },{ new: true } );
@@ -351,7 +351,7 @@ async function convert()
   employees.map(async (item,ind)=>{
     const hashed=await bcrypt.hash(item.password,10);
     await userModel.findOneAndUpdate({_id:item._id},{$set:{password:hashed}});
-    console.log(hashed);
+    //console.log(hashed);
   })
 }
 
