@@ -5,6 +5,7 @@ import AuthContext from '../contexts/AuthContext.js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/ApplyLeave.css'
+import SERVER from '../applink.js'
 function daysDifference(date1, date2) {
   const oneDay = 24 * 60 * 60 * 1000; 
   const firstDate = new Date(date1);
@@ -22,15 +23,15 @@ function ApplyLeave(props)
     const [leave,setLeave]=useState({from:'',to:'',message:''});
     const navigate=useNavigate('') 
     const {user, isLoggedIn, login, logout} = useContext(AuthContext);
-    const [granted,setGranted]=useState(0);
-    const [pending,setPending]=useState(0);
+    const [grant,setGranted]=useState(0);
+    const [pend,setPending]=useState(0);
     const [uiUpdate,setUiUpdate]=useState(0);
+
     function getLeaves()
     {
-      const obj={
-        empid:user.empid
-      }
-      axios.post('http://localhost:3500/getleaves',obj,{ withCredentials: true }).then((resp)=>{
+      const obj=
+      {empid:user.empid}
+      axios.post(`{SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
            toast.error(resp.data.message);
@@ -38,9 +39,10 @@ function ApplyLeave(props)
            else if(resp.data.success)
            {
             console.log("front end",resp.data.content);
-            setGranted(resp.data.content.granted);
-            setPending(resp.data.content.pending);
-            
+            setGranted(resp.data.content[0]?.granted);
+            setPending(resp.data.content[0]?.pending);
+            setUiUpdate(resp.data.content[0]?.pending);
+            console.log(user.total,pend,grant);
            }
            
         })
@@ -48,7 +50,7 @@ function ApplyLeave(props)
     }
     useEffect(()=>{
       getLeaves();
-    },[uiUpdate,granted,pending])
+    },[uiUpdate])
 
     async function submitHandle(event)
     {
@@ -61,15 +63,15 @@ function ApplyLeave(props)
         formData.append('empid',user.empid);
         formData.append('head',user.head);
         formData.append('status','pending');
-        const days=pending+granted;
+        const days=pend+grant;
         console.log("Hold = ",days);
         const diff=daysDifference(leave.from,leave.to)
         console.log(diff);
         console.log("leaves ==== ",leave);
         if(leave.from>leave.to)
           toast.error("To Date Cannot be before from Date");
-        else if(diff+granted+pending>user.total)
-          toast.error(`Only ${user.total-(pending+granted)} Leaves are Avilaiable`);
+        else if(diff+grant+pend>user.total)
+          toast.error(`Only ${user.total-(pend+grant)} Leaves are Avilaiable`);
         else  if(leave.from==='')
         toast.error('From date Cannot be Empty');
         else if(leave.to==='')
@@ -88,7 +90,7 @@ function ApplyLeave(props)
         //     status:'pending'
         // }
         //const obj={...leave,...ob};
-         axios.post('http://localhost:3500/apply',
+         axios.post(`{SERVER}/apply`,
            formData,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
@@ -121,11 +123,11 @@ function ApplyLeave(props)
         </div>
       </div>
       <div className="leave-info ">
-        <h1>Granted </h1> <h2>&nbsp;&nbsp;{granted} </h2> 
+        <h1>Granted </h1> <h2>&nbsp;&nbsp;{grant} </h2> 
       </div>
       <div className="leave-info ">
         <h1>Pending  </h1>
-        <h2> &nbsp;&nbsp;&nbsp;{pending}</h2>
+        <h2> &nbsp;&nbsp;&nbsp;{pend}</h2>
       </div>
   
   </div>

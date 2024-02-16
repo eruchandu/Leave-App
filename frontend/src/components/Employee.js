@@ -7,6 +7,7 @@ import Profile from './Profile.js'
 import ApplyLeave from "./ApplyLeave.js";
 import Employees from "./Employees.js";
 import AddEmployee from "./AddEmployee.js";
+import SERVER from '../applink.js'
 import '../css/Employee.css';
 import { FaUser } from "react-icons/fa";
 import { MdHistory } from "react-icons/md";

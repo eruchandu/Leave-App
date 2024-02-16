@@ -4,6 +4,7 @@ import {useEffect,useContext,useState} from 'react';
 import EmployeeFormModal from './EmployeeFormModel.js'
 import axios from 'axios'
 import '../css/Employee.css'
+import SERVER from '../applink.js'
 function Employees()
 {
    
@@ -17,7 +18,7 @@ function Employees()
     setShowModal(true);
   };
   const handleDelete=async (employee)=>{
-    axios.post("http://localhost:3500/employees/del",employee,{ withCredentials: true })
+    axios.post(`{SERVER}/employees/del`,employee,{ withCredentials: true })
     .then(res => {
         setUsers([])
         console.log(res)
@@ -32,7 +33,7 @@ function Employees()
 
    async function getData()
     {
-        let res=await axios.post("http://localhost:3500/employees",user,{ withCredentials: true })
+        let res=await axios.post(`{SERVER}/employees`,user,{ withCredentials: true })
         setUsers(res.data.content)
     }
 

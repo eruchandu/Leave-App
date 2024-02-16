@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import SERVER from '../applink.js'
 
 function EmployeeFormModal({ employee, onClose }) {
   const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ function EmployeeFormModal({ employee, onClose }) {
     e.preventDefault();
     try 
     {
-      await axios.post(`http://localhost:3500/employees/${employee.empid}`,formData,{ withCredentials: true });
+      await axios.post(`${SERVER}/employees/${employee.empid}`,formData,{ withCredentials: true });
       onClose();
     } catch (error) {
       console.error("Error updating employee details:", error);

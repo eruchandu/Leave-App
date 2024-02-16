@@ -8,7 +8,7 @@ function Home(){
           Your Partner in Human Resource Management and Employee Success
         </p>
         <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGB8v15MjvqJAACP3B898ldphzgj2CWdhxzbwK1bXGug&s" // Replace with your company logo or image
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGB8v15MjvqJAACP3B898ldphzgj2CWdhxzbwK1bXGug&s" 
           alt="HRMS Company Logo"
           className="img-fluid rounded"
         />

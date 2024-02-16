@@ -3,6 +3,7 @@ import AuthContext from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import SERVER from '../applink.js'
 function AddEmployee()
 {
 
@@ -22,7 +23,7 @@ function AddEmployee()
             role:employee.role,
             head:user.empid
         }
-         axios.post('http://localhost:3500/employees/add',
+         axios.post(`${SERVER}/employees/add`,
            ob,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
@@ -44,7 +45,7 @@ function AddEmployee()
             role:Role
         }
         
-         axios.post('http://localhost:3500/employees/list',
+         axios.post(`${SERVER}/employees/list`,
            ob,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {

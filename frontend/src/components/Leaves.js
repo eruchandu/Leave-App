@@ -6,13 +6,14 @@ import AuthContext from '../contexts/AuthContext.js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Leaves.css'
+import SERVER from '../applink.js'
 function Leaves(props)
 {
     const { user, isLoggedIn, login, logout} = useContext(AuthContext);
     const [leaves,setLeaves]=useState([]);
     
     async function getData(){
-        let res=await axios.post("http://localhost:3500/leaves",user,{ withCredentials: true })
+        let res=await axios.post(`${SERVER}/leaves`,user,{ withCredentials: true })
          setLeaves(res.data.content)
     }
     useEffect(()=>{
@@ -21,7 +22,7 @@ function Leaves(props)
       async function delleave(item)
       {
            console.log("del Leave function called")
-           let res=await axios.post("http://localhost:3500/revoke",item,{ withCredentials: true })
+           let res=await axios.post(`${SERVER}/revoke`,item,{ withCredentials: true })
          //  setLeaves(res.data.content)
            getData();
           // console.log("leaves after deleting",leaves,res.data.success);

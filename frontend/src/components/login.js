@@ -15,7 +15,7 @@ const navigate=useNavigate('');
 function submitHandler(event)
 {
     event.preventDefault();
-      axios.post('http://localhost:3500/',{
+      axios.post(`${SERVER}/`,{
           empid:User.empid,
           password:User.password
       },{ withCredentials: true }).then((resp)=>{

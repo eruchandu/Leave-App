@@ -5,6 +5,7 @@ import AuthContext from '../contexts/AuthContext.js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Approval.css'
+import SERVER from '../applink.js'
  function Approval()
 {
     const { user, isLoggedIn, login, logout} = useContext(AuthContext);
@@ -12,7 +13,7 @@ import '../css/Approval.css'
     let [updateui,setUpdateUi]=useState(0);
     async function getData()
     {
-        let res=await axios.post("http://localhost:3500/approval",user,{ withCredentials: true })
+        let res=await axios.post(`${SERVER}/approval`,user,{ withCredentials: true })
          setApprovals(res.data.content);
     }
     useEffect(()=>{
@@ -23,7 +24,7 @@ import '../css/Approval.css'
       {
         const obj={...item};
         obj.update=update;
-        axios.post('http://localhost:3500/approving',obj,{ withCredentials: true }).then((res)=>{
+        axios.post(`${SERVER}/approving`,obj,{ withCredentials: true }).then((res)=>{
         console.log("fun update",res) 
         getData();
             

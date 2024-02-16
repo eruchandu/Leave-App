@@ -146,11 +146,13 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 })
 
 
-app.post('/approval', async(req,res)=>{
+app.post('/approval', verifyToken,async(req,res)=>{
   const id=req.body.empid;
+
    //const approvals=templeave.filter((item,ind)=>(item.head==id&&item.status=='pending'))
- const approvals=await leaveModel.find({head:id,status:'pending'}).sort({from:1})
-     //console.log("approvals",approvals);
+   console.log("Approvals called",id)
+ const approvals=await leaveModel.find({head:id,status:'pending'})
+     console.log("approvals",approvals);
     res.send({success:true,content:approvals})
 })
 
@@ -182,9 +184,10 @@ app.post('/revoke',verifyToken,async (req,res)=>{
 })
 
 
-app.post('/employees',async(req,res)=>{
+app.post('/employees',verifyToken,async(req,res)=>{
   console.log("Employee  List Called")
   const id=req.body.empid;
+  console.log("id   ",id);
   userModel.find({head:id })
      .then(users=> {
        const extractedUsers = users.map(item => ({
@@ -196,9 +199,7 @@ app.post('/employees',async(req,res)=>{
          Address: item.Address,
          total: item.total
        }));
-      
-       
-       //console.log("Server Side ",extractedLeaves);
+       console.log("Server Side ",extractedUsers);
        res.send({success:true,content:extractedUsers,message:'Employees of your team'})
      })
      .catch(error => {
@@ -265,9 +266,9 @@ app.post('/employees/:id',verifyToken,(req,res)=>{
   res.send({success:true});
 })
 
-app.post('/leaves', verifyToken, async(req,res)=>{
+app.post('/leaves',verifyToken,async(req,res)=>{
  const id=req.body.empid;
- leaveModel.find({ empid:id }).sort({from:1})
+ leaveModel.find({ empid:id })
     .then(leaves => {
       const extractedLeaves = leaves.map(leave => ({
         _id: leave._id,
@@ -278,9 +279,6 @@ app.post('/leaves', verifyToken, async(req,res)=>{
         head: leave.head,
         status: leave.status
       }));
-      
-      
-      //console.log("Server Side ",extractedLeaves);
       res.send({success:true,content:extractedLeaves})
     })
     .catch(error => {
@@ -290,8 +288,9 @@ app.post('/leaves', verifyToken, async(req,res)=>{
 })
 app.post('/getleaves',verifyToken,async(req,res)=>{
   const {empid}=req.body;
-  let result=await userModel.findOne({empid:empid});
-  //console.log(result)
+ 
+  let result=await userModel.find({empid:empid});
+ console.log("Result = ",result);
   res.send({success:true,message:"get leaves",content:result});
 
 })
