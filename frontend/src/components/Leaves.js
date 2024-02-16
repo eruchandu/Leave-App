@@ -33,7 +33,7 @@ function Leaves(props)
             <div className="row mt-4 ">
                 {leaves?.map((item, ind) => {
                  return( 
-                 <div key={ind} className="col-md-4 Leave-card mt-3">
+                 <div key={ind} className="col-md-4 col-sm-6 col-lg-3 Leave-card mt-3">
                         <div className="card mb-4 shadow-sm">
                             <div className="card-body">
                                 <h5 className="card-title">Emp ID: {item.empid}</h5>

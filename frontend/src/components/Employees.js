@@ -48,7 +48,7 @@ function Employees()
             
                 {users?.map((item, ind) => {
                  return( 
-                 <div key={ind} className="col-md-4 mt-3 employees">
+                 <div key={ind} className="col-md-4 col-sm-6 col-lg-3 mt-3 employees">
                         <div className="card mb-4 shadow-sm">
                         {console.log("Checking",item)}
                         

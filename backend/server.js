@@ -38,7 +38,6 @@ app.listen(3500,(req,res)=>
 
 
 app.get('/',(req,res)=>{
-  
   res.send("hello world ");
 })
 const transporter = nodemailer.createTransport({
@@ -52,9 +51,8 @@ const transporter = nodemailer.createTransport({
 
 const verifyToken = (req, res, next) => 
 {
-  console.log("Practice : ",req);
+  //console.log("Practice : ",req);
   const token = req.cookies.jwt;
-   // console.log("TOKEN",token);
     if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
     jwt.verify(token, "abcdef", (err, decoded) => {
     if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -64,7 +62,7 @@ const verifyToken = (req, res, next) =>
 };
 
 app.post('/', async (req,res)=>{
-  console.log(req.headers)
+  //console.log(req.headers)
    console.log("post method called ",req.body.empid+" "+req.body.password);
     let result=await userModel.findOne({empid:req.body.empid});
     if(result)
@@ -89,9 +87,9 @@ app.post('/', async (req,res)=>{
 
 app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 {
-  console.log("apply called ");
-  console.log(req.body);
-  console.log(req.file);
+  //console.log("apply called ");
+  //console.log(req.body);
+  //console.log(req.file);
 
   const link = await uploadImage({imageName : req.file.filename, imagePath : req.file.path})
   console.log(link);
@@ -148,10 +146,7 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 })
 
 
-
-
-
-app.post('/approval',verifyToken, async(req,res)=>{
+app.post('/approval', async(req,res)=>{
   const id=req.body.empid;
    //const approvals=templeave.filter((item,ind)=>(item.head==id&&item.status=='pending'))
  const approvals=await leaveModel.find({head:id,status:'pending'}).sort({from:1})
@@ -187,7 +182,7 @@ app.post('/revoke',verifyToken,async (req,res)=>{
 })
 
 
-app.post('/employees', verifyToken, async(req,res)=>{
+app.post('/employees',async(req,res)=>{
   console.log("Employee  List Called")
   const id=req.body.empid;
   userModel.find({head:id })
@@ -296,7 +291,7 @@ app.post('/leaves', verifyToken, async(req,res)=>{
 app.post('/getleaves',verifyToken,async(req,res)=>{
   const {empid}=req.body;
   let result=await userModel.findOne({empid:empid});
-  console.log(result)
+  //console.log(result)
   res.send({success:true,message:"get leaves",content:result});
 
 })
@@ -375,4 +370,11 @@ function daysDifference(date1, date2) {
 app.use((_,res)=>{
   res.sendFile(`${__dirname}/public/index.html`)
 })
+
 //convert();
+async function func2()
+{
+  let res=await userModel.updateMany({},{$set:{total:20,pending:0,granted:0}});
+  let temp=await leaveModel.deleteMany({});
+}
+//func2();

@@ -36,7 +36,7 @@ import '../css/Approval.css'
             <div className="row mt-4">
                
                 {approvals?.map((item, ind) => (
-                    <div key={ind} className="col-md-4 approval">  
+                    <div key={ind} className="col-md-4 col-sm-6 col-lg-3 approval">  
                         <div className="card mb-4 shadow-sm ">
                             <div className="card-body">
                                 <h5 className="card-title">Emp ID: {item.empid}</h5>

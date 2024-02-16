@@ -19,7 +19,7 @@ function daysDifference(date1, date2) {
 
 function ApplyLeave(props)
 {
-    const [leave,setLeave]=useState({});
+    const [leave,setLeave]=useState({from:'',to:'',message:''});
     const navigate=useNavigate('') 
     const {user, isLoggedIn, login, logout} = useContext(AuthContext);
     const [granted,setGranted]=useState(0);
@@ -65,14 +65,19 @@ function ApplyLeave(props)
         console.log("Hold = ",days);
         const diff=daysDifference(leave.from,leave.to)
         console.log(diff);
+        console.log("leaves ==== ",leave);
         if(leave.from>leave.to)
-        {
           toast.error("To Date Cannot be before from Date");
-        }
         else if(diff+granted+pending>user.total)
-        {
           toast.error(`Only ${user.total-(pending+granted)} Leaves are Avilaiable`);
-        }
+        else  if(leave.from==='')
+        toast.error('From date Cannot be Empty');
+        else if(leave.to==='')
+        toast.error('To date Cannot be Empty');
+        else if(leave.message==='')
+        toast.error('Description Cannot be Empty');
+        else if(!event.target.elements.image.files[0])
+        toast.error('Image file Cannot be Empty');
 
         else
         {
