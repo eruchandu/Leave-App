@@ -49,9 +49,10 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const verifyToken = (req, res, next) => 
+export const verifyToken = (req, res, next) => 
 {
   //console.log("Practice : ",req);
+  //console.log("Verify token called")
   const token = req.cookies.jwt;
     if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
     jwt.verify(token, "abcdef", (err, decoded) => {
@@ -147,12 +148,10 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 
 
 app.post('/approval', verifyToken,async(req,res)=>{
-  const id=req.body.empid;
-
-   //const approvals=templeave.filter((item,ind)=>(item.head==id&&item.status=='pending'))
+   const id=req.body.empid;
    //console.log("Approvals called",id)
  const approvals=await leaveModel.find({head:id,status:'pending'})
-    // console.log("approvals",approvals);
+    //console.log("approvals",approvals);
     res.send({success:true,content:approvals})
 })
 
@@ -167,27 +166,39 @@ app.post('/revoke',verifyToken,async (req,res)=>{
   //console.log("Server side Leaves",leaves);
   leaveModel.deleteOne({ empid: id, status: 'pending', from: from })
   .then(async (result) => {
-    if (result.deletedCount > 0) {
+    if (result.deletedCount > 0) 
+    {
       console.log('Leave document deleted successfully');
       const diff=daysDifference(from,to);
      let answer=await userModel.findOneAndUpdate({ empid:id },{$inc:{pending: -diff }},{ new: true } );
      console.log(answer);
-    } else {
+     res.send({success:true})
+    } 
+    else {
       console.log('No matching leave document found to delete');
+      res.status(404).send({ error: 'No matching leave document found to delete' });
     }
+    
   })
-  .catch(error => {
+  .catch(error =>
+     {
     console.error('Error deleting leave document:', error);
+    res.status(404).send({ error: 'No matching leave document found to delete' });
   });
 
-  res.send({success:true})
+  
 })
 
 
 app.post('/employees',verifyToken,async(req,res)=>{
-//  console.log("Employee  List Called")
   const id=req.body.empid;
   console.log("id   ",id);
+  if(Object.keys(req.body).length === 0)
+  {
+   res.status(404).send({error:'Employee ID is required'});
+  }
+  else
+  {
   userModel.find({head:id })
      .then(users=> {
        const extractedUsers = users.map(item => ({
@@ -199,24 +210,32 @@ app.post('/employees',verifyToken,async(req,res)=>{
          Address: item.Address,
          total: item.total
        }));
-      // console.log("Server Side ",extractedUsers);
        res.send({success:true,content:extractedUsers,message:'Employees of your team'})
      })
      .catch(error => {
        console.error('Error fetching Users:', error);
        res.status(500).json({ error: 'Internal server error' });
      });
+    }
  })
  app.post('/employees/del',verifyToken,(req,res)=>{
   // console.log("Employee Delete Called ");
    const{empid}=req.body
    //console.log(empid);
+  // console.log("REquest BOdy ",req.body);
+   if(Object.keys(req.body).length === 0)
+   {
+    res.status(404).send({error:'Employee ID is required'});
+   }
+   else
+   {
   userModel.findOneAndUpdate(
     { empid: empid }, 
     { $set: {head:''} }
   )
   .then(async(updatedUsers) => {console.log(updatedUsers)})
   res.send({success:true});
+   }
 })
 app.post('/employees/list',verifyToken,(req,res)=>{
   const{role}=req.body
@@ -288,7 +307,6 @@ app.post('/leaves',verifyToken,async(req,res)=>{
 })
 app.post('/getleaves',verifyToken,async(req,res)=>{
   const {empid}=req.body;
- 
   let result=await userModel.find({empid:empid});
  //console.log("Result = ",result);
   res.send({success:true,message:"get leaves",content:result});
@@ -333,7 +351,7 @@ app.post('/approving', verifyToken ,async (req,res)=>{
 
       res.send("success");
     } else {
-     // console.log('Leave document not found');
+    
       res.status(404).send("Leave document not found");
     }
   })
@@ -377,3 +395,4 @@ async function func2()
   let temp=await leaveModel.deleteMany({});
 }
 //func2();
+export default app;

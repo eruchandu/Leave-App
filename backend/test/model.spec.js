@@ -8,8 +8,8 @@ describe('Testing Item model', () => {
   let sampleLeave,sampleLeave2;
   beforeEach(() => {
     sampleLeave = {
-      empid: 'DBIN496',
-      head: 'DBIN500',
+      empid: '496',
+      head: '500',
       from: "2024-02-23",
       to: "2024-02-22",
       message: "abcd",
@@ -17,7 +17,7 @@ describe('Testing Item model', () => {
       status:'pending'
     },
      sampleLeave2={
-      head: 'DBIN500',
+      head: '500',
       from: "2024-02-23",
       to: "2024-02-22",
       message: "abcd",
