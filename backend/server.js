@@ -11,13 +11,14 @@ import{uploadImage} from './fileparser.js'
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import dotenv from 'dotenv'
 import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const upload=multer({dest:`${__dirname}/temp/`})
 const addItemMiddleWare=upload.single('image');
 
-
+dotenv.config();
 const corsOptions = {
   origin: 'http://localhost:3000', 
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -43,8 +44,8 @@ app.get('/',(req,res)=>{
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'chandueru1316@gmail.com',
-    pass: 'ichpwhajbeezmkid'
+    user: `${process.env.SEND_MAIL}`,
+    pass:  `${process.env.SEND_PASS}`
   }
 });
 
@@ -55,7 +56,7 @@ export const verifyToken = (req, res, next) =>
   //console.log("Verify token called")
   const token = req.cookies.jwt;
     if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
-    jwt.verify(token, "abcdef", (err, decoded) => {
+    jwt.verify(token,`${process.env.SECRET_KEY}`, (err, decoded) => {
     if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
     req.userId = decoded.id;
     next();
@@ -88,9 +89,7 @@ app.post('/', async (req,res)=>{
 
 app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 {
-  //console.log("apply called ");
-  //console.log(req.body);
-  //console.log(req.file);
+  
 
   const link = await uploadImage({imageName : req.file.filename, imagePath : req.file.path})
   console.log(link);
@@ -241,7 +240,7 @@ app.post('/employees/list',verifyToken,(req,res)=>{
   const{role}=req.body
  // console.log(role);
   
- userModel.find({role:role,head:''})
+ userModel.find({role:role,head:"",})
  .then(async(updatedUsers) => 
    {
  // console.log(updatedUsers);
@@ -335,8 +334,8 @@ app.post('/approving', verifyToken ,async (req,res)=>{
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {pending: -diff }  },{ new: true } );
       console.log("Updated Leave ",obj);
       const mailOptions = {
-        from: 'chandueru1316@gmail.com',
-        to: obj.mail,
+        from: `${process.env.SEND_MAIL}`,
+        to: `${process.env.RECIVE_MAIL}`,
         subject: 'Leave Status Update',
         text: `Dear Employee,\n\nYour leave request from ${updatedLeave.from} to ${updatedLeave.to} has been ${message}ed.\n\nRegards,\nHR Team`
       };
@@ -369,7 +368,7 @@ async function convert()
   employees.map(async (item,ind)=>{
     const hashed=await bcrypt.hash(item.password,10);
     await userModel.findOneAndUpdate({_id:item._id},{$set:{password:hashed}});
-    //console.log(hashed);
+    console.log(hashed);
   })
 }
 

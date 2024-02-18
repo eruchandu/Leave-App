@@ -597,3 +597,49 @@ describe('POST /revoke', () => {
   
   
 });
+
+describe('POST /employees/add', () => {
+  let verifyTokenStub;
+  let findOneStub;
+  let findOneAndUpdateStub;
+
+  beforeEach(() => {
+    verifyTokenStub = sinon.stub(jwt, 'verify');
+    findOneStub = sinon.stub(userModel, 'findOne');
+    findOneAndUpdateStub = sinon.stub(userModel, 'findOneAndUpdate');
+  });
+
+  afterEach(() => {
+    verifyTokenStub.restore();
+    findOneStub.restore();
+    findOneAndUpdateStub.restore();
+  });
+
+  it('should handle scenario when employee is already assigned to someone', (done) =>
+   {
+    const mockToken = 'mockToken';
+    const mockUserId = 'mockUserId';
+    const empid = 'EMP002';
+    const name = 'John Doe';
+    const role = 'Developer';
+    const head = 'Manager';
+
+    verifyTokenStub.callsArgWith(2, null, { id: mockUserId }); // Simulate successful token verification
+    findOneStub.resolves({ empid: 'DBIN496', head: 'DBIN500' }); // Simulate user already assigned to someone
+
+    chai.request(app)
+      .post('/employees/add')
+      .set('Cookie', [`jwt=${mockToken}`])
+      .send({ empid, name, role, head })
+      .end((err, res) => {
+        if(err)
+        {
+        console.log(err)
+        done();
+        }
+        expect(res).to.have.status(200);
+        expect(res.body.success).to.be.false;
+        done();
+      });
+  })
+});
