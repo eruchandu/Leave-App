@@ -36,7 +36,7 @@ app.listen(3500,(req,res)=>
 {
     console.log("server started at 3500");
 })
-
+let map={};
 
 app.get('/',(req,res)=>{
   res.send("hello world ");
@@ -90,10 +90,8 @@ app.post('/', async (req,res)=>{
 app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
 {
   
-
   const link = await uploadImage({imageName : req.file.filename, imagePath : req.file.path})
   console.log(link);
-
  const obj={
   from:req.body.from,
   to:req.body.to,
@@ -170,7 +168,7 @@ app.post('/revoke',verifyToken,async (req,res)=>{
       console.log('Leave document deleted successfully');
       const diff=daysDifference(from,to);
      let answer=await userModel.findOneAndUpdate({ empid:id },{$inc:{pending: -diff }},{ new: true } );
-     console.log(answer);
+    // console.log(answer);
      res.send({success:true})
     } 
     else {
@@ -217,33 +215,28 @@ app.post('/employees',verifyToken,async(req,res)=>{
      });
     }
  })
- app.post('/employees/del',verifyToken,(req,res)=>{
-  // console.log("Employee Delete Called ");
+ app.post('/employees/del',verifyToken,async (req,res)=>{
    const{empid}=req.body
-   //console.log(empid);
-  // console.log("REquest BOdy ",req.body);
    if(Object.keys(req.body).length === 0)
    {
     res.status(404).send({error:'Employee ID is required'});
    }
    else
    {
-  userModel.findOneAndUpdate(
+  let result=await userModel.findOneAndUpdate(
     { empid: empid }, 
     { $set: {head:''} }
   )
-  .then(async(updatedUsers) => {console.log(updatedUsers)})
+  if(result)
   res.send({success:true});
-   }
-})
+  else
+  res.send({sucess:false});
+}})
 app.post('/employees/list',verifyToken,(req,res)=>{
-  const{role}=req.body
- // console.log(role);
-  
+  const{role}=req.body 
  userModel.find({role:role,head:"",})
  .then(async(updatedUsers) => 
    {
- // console.log(updatedUsers);
   if(updatedUsers.length>0)
   res.send({success:true,content:updatedUsers,message:`Unassigned ${role}`});
   else
@@ -255,7 +248,6 @@ app.post('/employees/list',verifyToken,(req,res)=>{
 app.post('/employees/add',verifyToken,async(req,res)=>{
 
   const{empid,name,role,head}=req.body
- // console.log(empid);
   const emp=await userModel.findOne({empid:empid});
   if(emp.head!=="")
   {
@@ -272,9 +264,8 @@ app.post('/employees/add',verifyToken,async(req,res)=>{
   }
 })
 app.post('/employees/:id',verifyToken,(req,res)=>{
- // console.log(req.params.id);
+
   const {name,role,contact,Address,total}=req.body;
- // console.log(req.body);
   userModel.findOneAndUpdate(
     { empid: req.params.id }, 
     { $set: {name: name,role:role,contact:contact,Address:Address,total:total} }, 
@@ -300,7 +291,7 @@ app.post('/leaves',verifyToken,async(req,res)=>{
       res.send({success:true,content:extractedLeaves})
     })
     .catch(error => {
-      console.error('Error fetching leaves:', error);
+      //console.error('Error fetching leaves:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 })
@@ -309,13 +300,23 @@ app.post('/getleaves',verifyToken,async(req,res)=>{
   let result=await userModel.find({empid:empid});
  //console.log("Result = ",result);
   res.send({success:true,message:"get leaves",content:result});
+})
+app.post('/logout',verifyToken,async(req,res)=>{
+  console.log("Logged out");
+  try{
+    res.clearCookie('jwt', { sameSite: 'Lax', expires: new Date(Date.now() + 0) }); 
+    res.send({ success: true, message: "Successfully logged out" });
+  }catch(err)
+  {
+    console.log("error occured",err);
+    res.send({success:false,message:"Unsuccessful Logout"});
+  }
 
 })
 app.post('/approving', verifyToken ,async (req,res)=>{
   let id=req.body.empid;
   let date=req.body.from;
   let message=req.body.update;
-  //console.log("Approving called");
   leaveModel.findOneAndUpdate(
     { empid: id, from: date, status: 'pending' }, 
     { $set: { status: message } }, 
@@ -323,8 +324,8 @@ app.post('/approving', verifyToken ,async (req,res)=>{
   )
   .then(async(updatedLeave) => {
     if (updatedLeave) {
-     //console.log('Leave document updated successfully:', updatedLeave);
-     console.log("Leave update",updatedLeave.from,"   ",updatedLeave.to)
+    //  //console.log('Leave document updated successfully:', updatedLeave);
+    //  console.log("Leave update",updatedLeave.from,"   ",updatedLeave.to)
      const diff=daysDifference(updatedLeave.from,updatedLeave.to);
     // console.log(diff);
      let obj={};
@@ -332,7 +333,7 @@ app.post('/approving', verifyToken ,async (req,res)=>{
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {granted: diff, pending: -diff }  },{ new: true } );
        else
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {pending: -diff }  },{ new: true } );
-      console.log("Updated Leave ",obj);
+     // console.log("Updated Leave ",obj);
       const mailOptions = {
         from: `${process.env.SEND_MAIL}`,
         to: `${process.env.RECIVE_MAIL}`,
@@ -361,12 +362,71 @@ app.post('/approving', verifyToken ,async (req,res)=>{
   
 })
 
+app.post('/forget',async(req,res)=>{
+  const {empid}=req.body;
+  console.log("Forget Route Called ",empid);
+  let result=await userModel.findOne({empid:empid});
+ // console.log(result);
+  if(result)
+  {
+   let val=otpGenerator();
+   const mailOptions = {
+    from: `${process.env.SEND_MAIL}`,
+    to: `${process.env.RECIVE_MAIL}`,
+    subject: 'Forget Password',
+    text: `Dear Employee,\n\nYour OTP for Password change  ${val} \n\n Don't share with Anyone \n\n Regards,\nHR Team`
+  };
 
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+   map[empid]=val;
+  res.send({success:true,message:'Otp sent'});
+  }
+  else{
+    res.send({success:false,message:'user Not found'});
+  }
+
+})
+app.post('/forget/check',async(req,res)=>{
+  const {empid,otp}=req.body;
+  //console.log("Forget Route Called ",empid);
+  let result=await userModel.findOne({empid:empid});
+  console.log(result);
+  if(map[empid]===otp)
+  {
+  delete map[empid];
+  res.send({success:true,message:'OTP Matched'});
+  }
+  else
+  {
+    res.send({success:false,message:'Wrong OTP '});
+  }
+
+})
+app.post('/forget/update',async(req,res)=>{
+  const {empid,password}=req.body;
+  console.log("Set Password  Called ",empid,password);
+  const hashed=await bcrypt.hash(password,10);
+  let response =await userModel.findOneAndUpdate(
+    { empid: empid }, 
+    { $set: {password: hashed} }, 
+    { new: true } 
+  )
+  if(response)
+  res.send({success:true,message:'Password updated Successfully'});
+  else
+    res.send({success:false,message:'Not Updated'});
+})
 async function convert()
 {
   const employees=await userModel.find();
   employees.map(async (item,ind)=>{
-    const hashed=await bcrypt.hash(item.password,10);
+    const hashed=await bcrypt.hash(item.empid,10);
     await userModel.findOneAndUpdate({_id:item._id},{$set:{password:hashed}});
     console.log(hashed);
   })
@@ -386,12 +446,22 @@ function daysDifference(date1, date2) {
 app.use((_,res)=>{
   res.sendFile(`${__dirname}/public/index.html`)
 })
-
-//convert();
 async function func2()
 {
   let res=await userModel.updateMany({},{$set:{total:20,pending:0,granted:0}});
   let temp=await leaveModel.deleteMany({});
 }
 //func2();
+function otpGenerator()
+{
+  let otp='';
+  for(let i=0;i<4;i++)
+  {
+    let x = Math.random() * 10;
+    x=Math.floor(x);
+    otp=otp+x;
+  }
+  console.log(otp);
+  return otp;
+}
 export default app;
