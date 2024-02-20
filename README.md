@@ -20,6 +20,31 @@ The Staff Leave Application is a web-based system designed to simplify the leave
 - Manager has all the features of Employee.
 
 
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`PORT`
+
+`AWS_ACCESS_KEY_ID`
+
+`AWS_SECRET_ACCESS_KEY`
+
+`S3_REGION`
+
+`S3_BUCKET`
+
+`DB_PASS`
+
+`DB_USER`
+
+`RECIVE_MAIL`
+
+`SEND_MAIL`
+
+`SEND_PASS`
+
+`SECRET_KEY`
 ## Installation
 - Clone this project using git clone 
 ```bash
