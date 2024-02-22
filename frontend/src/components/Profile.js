@@ -8,11 +8,12 @@ function Profile(props)
   const { user, isLoggedIn, login, logout } =useContext(AuthContext);
     
     return(
-      <div class="container">
-      <div class="profile-container ">
+      <div className="d-flex">
+      <div class="container d-flex">
+      <div class="profile-container w-50 mx-2">
           <h1 class="text-center mb-3">User Profile</h1>
-          <div class="row">
-              <div class="col-sm-6 mx-auto">
+          <div class="row ">
+              <div class="col-sm-6  w-75 mx-auto">
                   <h6><strong>Name:</strong> {user.name}</h6>
                   <h6><strong>Mail:</strong> {user.mail}</h6>
                   <h6><strong>Empid:</strong> {user.empid}</h6>
@@ -21,6 +22,10 @@ function Profile(props)
                   <h6><strong>Role:</strong> {user.role}</h6>
               </div>
           </div>
+      </div>
+      <div className='image w-50'>
+      <img src='../dashboard.svg'/>
+      </div>
       </div>
   </div>)
 }

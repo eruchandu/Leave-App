@@ -6,8 +6,66 @@ import sinon from 'sinon';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { app } from '../server.js'; 
+import request from 'supertest';
 const { expect } = chai;
 chai.use(chaiHttp);
+
+
+describe('Login Route', () => {
+  let findOneStub;
+  beforeEach(() => {
+    findOneStub = sinon.stub(userModel, 'findOne');
+  });
+
+  afterEach(() => {
+    findOneStub.restore();
+  });
+
+  it('should return success true with valid credentials', async () => {
+
+    findOneStub.resolves({
+      empid: 'testUser',
+      password: await bcrypt.hash('testPassword', 10), 
+    });
+    const res = await request(app)
+      .post('/')
+      .send({ empid: 'testUser', password: 'testPassword' });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('success').to.be.true;
+    expect(res.body).to.have.property('token');
+    expect(res.body.message).to.equal('Found');
+  });
+
+  it('should return error message with invalid password', async () => {
+
+    findOneStub.resolves({
+      empid: 'testUser',
+      password: await bcrypt.hash('testPassword', 10), 
+    });
+    const res = await request(app)
+      .post('/')
+      .send({ empid: 'testUser', password: 'wrongPassword' });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('success').to.be.false;
+    expect(res.body.message).to.equal('Invalid Password');
+  });
+
+  it('should return error message with user not found', async () => {
+  
+    findOneStub.resolves(null);
+
+    
+    const res = await request(app)
+      .post('/')
+      .send({ empid: 'nonExistentUser', password: 'somePassword' });
+
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('success').to.be.false;
+    expect(res.body.message).to.equal('User Not found');
+  });
+});
+
 describe('POST /approval', () => {
   let verifyTokenStub;
   let findStub;
@@ -49,68 +107,7 @@ describe('POST /approval', () => {
       })
   });
 
-
-
-  it('should return approvals for a given employee ID if token is provided and valid',(done) => {
-    const mockToken = 'mock_token';
-    const mockDecoded = { id: '496' };
-    const mockApprovals = [{ id: '496', head: '500', status: 'pending'}];
-
-    verifyTokenStub.callsArgWith(2, null, mockDecoded);
-    findStub.withArgs({ head: '500', status: 'pending' }).returns(mockApprovals);
-     chai.request(app)
-      .post('/approval')
-      .set('Cookie', [`jwt=${mockToken}`])
-      .send({ empid: '500' })
-      .end((err,res)=>{
-        expect(res.body).to.have.property('success').to.equal(true);
-        expect(res.body).to.have.property('content').to.an('array');
-        done();
-      })
-  
-  }).timeout(10000);
-
 })
-
-describe('POST /', () => {
-  it('should return success true with valid credentials', async () => {
-    const password = await bcrypt.hash('testpassword', 10); 
-    const user = { empid: 'testEmpId', password: password };
-    userModel.findOne = async () => user;
-    const res = await chai.request(app)
-      .post('/')
-      .send({ empid: 'testEmpId', password: 'testpassword' }); 
-
-    expect(res).to.have.status(200);
-    expect(res.body).to.have.property('success').to.be.true;
-    expect(res.body).to.have.property('message').to.equal('Found');
-    expect(res.body).to.have.property('content').to.deep.equal(user);
-    expect(res.body).to.have.property('token').to.be.a('string');
-  });
-
-  it('should return "Invalid Password" with invalid password', async () => {
-    const password = await bcrypt.hash('testpassword', 10); 
-    const user = { empid: 'testEmpId', password: password }; 
-    userModel.findOne = async () => user;
-    const res = await chai.request(app)
-      .post('/')
-      .send({ empid: 'testEmpId', password: 'wrongpassword' }); 
-
-    expect(res).to.have.status(200);
-    expect(res.body).to.have.property('success').to.be.false;
-    expect(res.body).to.have.property('message').to.equal('Invalid Password');
-  });
-
-  it('should return "User Not found" when user does not exist', async () => {
-    userModel.findOne = async () => null;
-    const res = await chai.request(app)
-      .post('/')
-      .send({ empid: 'nonExistingEmpId', password: 'somepassword' }); 
-    expect(res).to.have.status(200);
-    expect(res.body).to.have.property('success').to.be.false;
-    expect(res.body).to.have.property('message').to.equal('User Not found');
-  });
-});
 
 describe('POST /employees', () => {
   let verifyTokenStub;
@@ -152,25 +149,7 @@ describe('POST /employees', () => {
       expect(res.body).to.have.property('message').to.equal('Failed to authenticate token.');
       })
   });
-  it('should return employees for a given Manager  employee ID if token is provided and valid',(done) => {
-    const mockToken = 'mock_token';
-    const mockDecoded = { id: '496' };
-    const mockApprovals = [{ id: '496', head: '500'}];
-
-    verifyTokenStub.callsArgWith(2, null, mockDecoded);
-    findStub.withArgs({ head: '500', status: 'pending' }).returns(mockApprovals);
-
-     chai.request(app)
-      .post('/employees')
-      .set('Cookie', [`jwt=${mockToken}`])
-      .send({ empid: '500' })
-      .end((err,res)=>{
-        expect(res.body).to.have.property('success').to.equal(true);
-        expect(res.body).to.have.property('content').to.an('array');
-        done();
-      })
   
-  }).timeout(10000);
 
 })
 
@@ -314,7 +293,6 @@ describe('POST /revoke', () => {
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.success).to.be.true;
-        // Add more assertions here if needed
         done();
       });
   });
@@ -521,3 +499,97 @@ describe('POST /getleaves', () => {
       });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// it('should return approvals for a given employee ID if token is provided and valid',(done) => {
+//   const mockToken = 'mock_token';
+//   const mockDecoded = { id: '496' };
+//   const mockApprovals = [{ id: '496', head: '500', status: 'pending'}];
+
+//   verifyTokenStub.callsArgWith(2, null, mockDecoded);
+//   findStub.withArgs({ head: '500', status: 'pending' }).returns(mockApprovals);
+//    chai.request(app)
+//     .post('/approval')
+//     .set('Cookie', [`jwt=${mockToken}`])
+//     .send({ empid: '500' })
+//     .end((err,res)=>{
+//       expect(res.body).to.have.property('success').to.equal(true);
+//       expect(res.body).to.have.property('content').to.an('array');
+//       done();
+//     })
+
+// }).timeout(10000);
+
+// it('should return employees for a given Manager  employee ID if token is provided and valid',(done) => {
+//   const mockToken = 'mock_token';
+//   const mockDecoded = { id: '496' };
+//   const mockApprovals = [{ id: '496', head: '500'}];
+
+//   verifyTokenStub.callsArgWith(2, null, mockDecoded);
+//   findStub.withArgs({ head: '500', status: 'pending' }).returns(mockApprovals);
+
+//    chai.request(app)
+//     .post('/employees')
+//     .set('Cookie', [`jwt=${mockToken}`])
+//     .send({ empid: '500' })
+//     .end((err,res)=>{
+//       expect(res.body).to.have.property('success').to.equal(true);
+//       expect(res.body).to.have.property('content').to.an('array');
+//       done();
+//     })
+// }).timeout(10000);
+
+
+

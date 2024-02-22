@@ -19,7 +19,8 @@ export function dbConnect()
     }
     const con=mongoose.connection;
     con.once('open',()=>{
-      // console.log("Connected to db")
+        
+       console.log("Connected to db")
     })
     con.on('error',(err)=>{
         console.log("error occured",err);
