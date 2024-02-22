@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Forget from './Forget.js'
 import SERVER from '../applink.js'
+import image from './profile.svg';
 function Login(){
   let [User,SetUser]=useState({empid:'',password:''});
 const { user, isLoggedIn, login, logout} = useContext(AuthContext);
@@ -48,7 +49,7 @@ function handleForgetClick(event)
 return(
      <div className='border border-5 w-50 mx-auto mt-5 pb-4 shadow rounded'>
       <div className='login-form mx-auto w-75 mt-5 d-flex'>
-        <img src='../profile.svg' className='w-75 mx-auto'></img>
+        <img src={image} className='w-75 mx-auto'></img>
       </div>
     <div className='login-form mx-auto w-75 mt-5 '>
        <form onSubmit={submitHandler}>
