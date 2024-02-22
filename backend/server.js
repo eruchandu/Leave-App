@@ -465,7 +465,7 @@ function otpGenerator()
   return otp;
 }
 
-app.listen(3500,(req,res)=>
+app.listen(process.env.PORT,(req,res)=>
 {
     console.log("server started at 3500");
  })
