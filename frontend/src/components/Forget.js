@@ -156,3 +156,4 @@ useEffect(()=>{},[displayuser,displayotp,displaypass])
 }
 
 export default Forget;
+

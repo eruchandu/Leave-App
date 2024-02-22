@@ -16,9 +16,9 @@ body {
     text-align: left;
     padding: 10px 15px;
     border: none;
-    /* background-color: transparent;
+    background-color: transparent;
     color: #5b5d5f;
-    transition: background-color 0.3s ease; */
+    transition: background-color 0.3s ease;
   }
   .sidebar .btn:hover {
     background-color: #495057;

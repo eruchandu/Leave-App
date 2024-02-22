@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
   },[]);
   const login = (userData) => {
     // Implement your login logic here
+    console.log('\n Login context Called ');
     localStorage.setItem('user',JSON.stringify(userData))
     localStorage.setItem('isLoggedIn',true);
     setUser(userData);
@@ -27,6 +28,7 @@ const AuthProvider = ({ children }) => {
   const logout = async() => {
     // Implement your logout logic here
     // let res=await axios.post("http://localhost:3500/logout",user,{ withCredentials: true })
+    console.log('Logout context Called ');
     localStorage.removeItem('user');
     localStorage.removeItem('isLoggedIn');
     setUser({});
