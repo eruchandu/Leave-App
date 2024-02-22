@@ -50,7 +50,7 @@ const transporter = nodemailer.createTransport({
 export const verifyToken = (req, res, next) => 
 {
   //console.log("Practice : ",req);
-  console.log("Verify token called")
+ // console.log("Verify token called")
   const token = req.cookies.jwt;
   if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
   jwt.verify(token,`${process.env.SECRET_KEY}`, (err, decoded) => {
@@ -233,7 +233,9 @@ app.post('/revoke',verifyToken,async (req,res)=>{
   res.send({sucess:false});
 }})
 app.post('/employees/list',verifyToken,(req,res)=>{
-  const{role}=req.body 
+  let {role}=req.body 
+  role=role.toLowerCase();
+ // console.log(role);
  userModel.find({role:role,head:"",})
  .then(async(updatedUsers) => 
    {

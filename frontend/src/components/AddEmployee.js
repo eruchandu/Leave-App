@@ -93,15 +93,22 @@ function AddEmployee()
 </div>
 <div >
 <form onSubmit={submitHandleRole}>
-    <div className=' d-flex mt-3  border border-2'>
-       <div class="form-group  mx-5 mt-2 w-50" >
-          <label for="Role">Search for Unassigned Employees</label>
-           <input type="text" class="form-control mt-3 mb-4" id="Role" name="Role" value={Role} onChange={(e)=>setRole(e.target.value)} ></input>
-      </div>
-       <div>
-     <button type="submit" class="btn btn-primary mt-5 mx-3">Check</button>
-     </div>
-     </div>
+    <div className='d-flex mt-3 border border-2'>
+        <div className="form-group mx-5 mt-2 w-50">
+            <label htmlFor="Role">Search for unassigned Employees</label>
+            <select className="form-control mt-3 mb-4" id="Role" name="Role" value={Role} onChange={(e) => setRole(e.target.value)}>
+                <option value="">Select Role</option>
+                <option value="Intern">Intern</option>
+                <option value="Manager">Manager</option>
+                <option value="SDE-I">SDE-I</option>
+                <option value="SDE-II">SDE-II</option>
+                <option value="SDE-III">SDE-III</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" className="btn btn-primary mt-5 mx-3">Check</button>
+        </div>
+    </div>
 </form>
 </div>
 <div>
