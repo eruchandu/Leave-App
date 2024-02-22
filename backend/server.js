@@ -32,10 +32,7 @@ app.use(cookieParser())
 app.use(bodyParser())
 app.use(express.static(path.join(__dirname, 'public')));
 dbConnect();
-app.listen(3500,(req,res)=>
-{
-    console.log("server started at 3500");
-})
+
 let map={};
 
 app.get('/',(req,res)=>{
@@ -53,10 +50,10 @@ const transporter = nodemailer.createTransport({
 export const verifyToken = (req, res, next) => 
 {
   //console.log("Practice : ",req);
-  //console.log("Verify token called")
+  console.log("Verify token called")
   const token = req.cookies.jwt;
-    if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
-    jwt.verify(token,`${process.env.SECRET_KEY}`, (err, decoded) => {
+  if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
+  jwt.verify(token,`${process.env.SECRET_KEY}`, (err, decoded) => {
     if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
     req.userId = decoded.id;
     next();
@@ -65,26 +62,28 @@ export const verifyToken = (req, res, next) =>
 
 app.post('/', async (req,res)=>{
   //console.log(req.headers)
-   //console.log("post method called ",req.body.empid+" "+req.body.password);
-    let result=await userModel.findOne({empid:req.body.empid});
-    if(result)
+  //console.log("post method called ",req.body.empid+" "+req.body.password);
+  let result=await userModel.findOne({empid:req.body.empid});
+  //console.log(result);
+  if(result)
+  {
+    const passwordMatch = await bcrypt.compare(req.body.password,result.password);
+    if(passwordMatch)
     {
-     const passwordMatch = await bcrypt.compare(req.body.password,result.password);
-      if(passwordMatch)
-      {
-        const token=jwt.sign({id:result.empid},"abcdef",{expiresIn:(1000*10*10)})
-        res.cookie('jwt',token, { sameSite: 'Lax', expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) });
-        res.send({success:true,message:"Found",content:result,token:token})
-      }
-      else
-      {
-        res.send({success:false,message:"Invalid Password",content:result})
-      }
+      const token=jwt.sign({id:result.empid},"abcdef",{expiresIn:(1000*10*10)})
+      res.cookie('jwt',token, { sameSite: 'Lax', expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) });
+      res.send({success:true,message:"Found",content:result,token:token})
     }
     else
     {
-      res.send({success:false,message:"User Not found",content:result})
+      res.send({success:false,message:"Invalid Password",content:result})
     }
+  }
+  else
+  {
+    res.send({success:false,message:"User Not found",content:result})
+  }
+
 })
 
 app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
@@ -92,74 +91,74 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
   
   const link = await uploadImage({imageName : req.file.filename, imagePath : req.file.path})
   console.log(link);
- const obj={
-  from:req.body.from,
-  to:req.body.to,
-  message:req.body.description,
-  head:req.body.head,
-  status:req.body.status,
+  const obj={
+    from:req.body.from,
+    to:req.body.to,
+    message:req.body.description,
+    head:req.body.head,
+    status:req.body.status,
   empid:req.body.empid,
   image:link
- }
-   
-  leaveModel.aggregate([
-    {
-      $match: {
-        empid: req.body.empid,
-        $or: [
-          { from: { $lte: req.body.from }, to: { $gte: req.body.from } },
-          { from: { $lte: req.body.to }, to: { $gt: req.body.to } },
-          { from: { $lte: req.body.from }, to: { $gte: req.body.to } }
-        ]
-      }
-    },
-    {
-      $project: {
-        from: 1,
-        to: 1,
-        _id: 0 
-      }
-    }
-  ]).then(async (result) => {
-    if(result.length==0)
-    {
-      const newLeave=new leaveModel(obj);
-      let resp=await newLeave.save();
-      const diff=daysDifference(obj.from,obj.to);
-      //console.log("Applied no of leaves ",diff)
-      let answer = await userModel.findOneAndUpdate( { empid: obj.empid },{$inc: {pending: diff }  },{ new: true } );
-     // console.log("Applied leaved modified ",answer)
-      res.send({success:true,message:"Leave Applied"})
-    }
-    else
-      res.send({success:false,message:`Pending Leave on \n ${result[0].from} to ${result[0].to}`})
+}
 
-  })
-  .catch(err => {
-    console.log(err);
-    res.send({success:false,message:`Not Applied`});
-  });
+leaveModel.aggregate([
+  {
+    $match: {
+      empid: req.body.empid,
+      $or: [
+        { from: { $lte: req.body.from }, to: { $gte: req.body.from } },
+        { from: { $lte: req.body.to }, to: { $gte: req.body.to } },
+        {from:{$gte:req.body.from},to:{$lte:req.body.to}}
+      ]
+    }
+  },
+  {
+    $project: {
+      from: 1,
+      to: 1,
+      _id: 0 
+    }
+  }
+]).then(async (result) => {
+  if(result.length==0)
+  {
+    const newLeave=new leaveModel(obj);
+    let resp=await newLeave.save();
+    const diff=daysDifference(obj.from,obj.to);
+    //console.log("Applied no of leaves ",diff)
+    let answer = await userModel.findOneAndUpdate( { empid: obj.empid },{$inc: {pending: diff }  },{ new: true } );
+    // console.log("Applied leaved modified ",answer)
+    res.send({success:true,message:"Leave Applied"})
+  }
+  else
+  res.send({success:false,message:`Pending Leave on \n ${result[0].from} to ${result[0].to}`})
 
-  // res.send({success:false,message:'checking s3'})
+})
+.catch(err => {
+  console.log(err);
+  res.send({success:false,message:`Not Applied`});
+});
+
+// res.send({success:false,message:'checking s3'})
 })
 
 
 app.post('/approval', verifyToken,async(req,res)=>{
-   const id=req.body.empid;
-   //console.log("Approvals called",id)
- const approvals=await leaveModel.find({head:id,status:'pending'})
-    //console.log("approvals",approvals);
-    res.send({success:true,content:approvals})
+  const id=req.body.empid;
+  //console.log("Approvals called",id)
+  const approvals=await leaveModel.find({head:id,status:'pending'})
+  //console.log("approvals",approvals);
+  res.send({success:true,content:approvals})
 })
 
 
 
 app.post('/revoke',verifyToken,async (req,res)=>{
- // console.log("revoke callled")
+  // console.log("revoke callled")
   const id=req.body.empid;
   const from=req.body.from;
   const to=req.body.to;
- // const leaves=templeave.filter((item,ind)=>((!(item.empid==id&&item.status=='pending'&&item.from==from))&&item.empid==id))
+  // const leaves=templeave.filter((item,ind)=>((!(item.empid==id&&item.status=='pending'&&item.from==from))&&item.empid==id))
   //console.log("Server side Leaves",leaves);
   leaveModel.deleteOne({ empid: id, status: 'pending', from: from })
   .then(async (result) => {
@@ -167,9 +166,9 @@ app.post('/revoke',verifyToken,async (req,res)=>{
     {
       console.log('Leave document deleted successfully');
       const diff=daysDifference(from,to);
-     let answer=await userModel.findOneAndUpdate({ empid:id },{$inc:{pending: -diff }},{ new: true } );
-    // console.log(answer);
-     res.send({success:true})
+      let answer=await userModel.findOneAndUpdate({ empid:id },{$inc:{pending: -diff }},{ new: true } );
+      // console.log(answer);
+      res.send({success:true})
     } 
     else {
       console.log('No matching leave document found to delete');
@@ -178,38 +177,39 @@ app.post('/revoke',verifyToken,async (req,res)=>{
     
   })
   .catch(error =>
-     {
-    console.error('Error deleting leave document:', error);
-    res.status(404).send({ error: 'No matching leave document found to delete' });
-  });
-
+    {
+      console.error('Error deleting leave document:', error);
+      res.status(404).send({ error: 'No matching leave document found to delete' });
+    });
+    
+    
+  })
   
-})
-
-
-app.post('/employees',verifyToken,async(req,res)=>{
-  const id=req.body.empid;
-  console.log("id   ",id);
-  if(Object.keys(req.body).length === 0)
-  {
-   res.status(404).send({error:'Employee ID is required'});
-  }
-  else
-  {
-  userModel.find({head:id })
-     .then(users=> {
-       const extractedUsers = users.map(item => ({
-         _id: item._id,
-         name: item.name,
-         empid: item.empid,
-         role: item.role,
-         contact: item.contact,
-         Address: item.Address,
-         total: item.total
-       }));
-       res.send({success:true,content:extractedUsers,message:'Employees of your team'})
-     })
-     .catch(error => {
+  
+  app.post('/employees',verifyToken,async(req,res)=>{
+    const id=req.body.empid;
+    console.log("id   ",id);
+    if(Object.keys(req.body).length === 0)
+    {
+      res.status(404).send({error:'Employee ID is required'});
+    }
+    else
+    {
+      userModel.find({head:id })
+      .then(users=> {
+        const extractedUsers = users.map(item => ({
+          _id: item._id,
+          name: item.name,
+          empid: item.empid,
+          role: item.role,
+          contact: item.contact,
+          Address: item.Address,
+          total: item.total
+        }));
+        res.send({success:true,content:extractedUsers,message:'Employees of your team'})
+      })
+      .catch(error => {
+       
        console.error('Error fetching Users:', error);
        res.status(500).json({ error: 'Internal server error' });
      });
@@ -431,17 +431,17 @@ async function convert()
     console.log(hashed);
   })
 }
-
-function daysDifference(date1, date2) {
-  const oneDay = 24 * 60 * 60 * 1000; 
+function daysDifference(date1, date2) 
+{
+  const oneDay = 24 * 60 * 60 * 1000;
   const firstDate = new Date(date1);
   const secondDate = new Date(date2);
-  const diffMilliseconds = Math.abs(firstDate - secondDate);
-
-  const diffDays = Math.round(diffMilliseconds / oneDay);
-  //console.log(diffDays)
-
-  return diffDays+1;
+  const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+  const startDayOfWeek = firstDate.getDay(); 
+  const endDayOfWeek = secondDate.getDay(); 
+  let totalWeekends = Math.floor((diffDays + startDayOfWeek - endDayOfWeek) / 7) * 2;
+  const diffWithoutWeekends = diffDays - totalWeekends;
+  return diffWithoutWeekends + 1; 
 }
 app.use((_,res)=>{
   res.sendFile(`${__dirname}/public/index.html`)
@@ -464,4 +464,9 @@ function otpGenerator()
   console.log(otp);
   return otp;
 }
+app.listen(process.env.PORT,(req,res)=>
+{
+    console.log(`server started at${process.env.PORT}` );
+ })
+
 export default app;

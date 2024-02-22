@@ -7,25 +7,33 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../css/ApplyLeave.css'
 import SERVER from '../applink.js'
 function daysDifference(date1, date2) {
-  const oneDay = 24 * 60 * 60 * 1000; 
+  const oneDay = 24 * 60 * 60 * 1000;
   const firstDate = new Date(date1);
   const secondDate = new Date(date2);
-  const diffMilliseconds = Math.abs(firstDate - secondDate);
-
-  const diffDays = Math.round(diffMilliseconds / oneDay);
-  console.log(diffDays)
-
-  return diffDays+1;
+  const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+  const startDayOfWeek = firstDate.getDay(); 
+  const endDayOfWeek = secondDate.getDay(); 
+  let totalWeekends = Math.floor((diffDays + startDayOfWeek - endDayOfWeek) / 7) * 2;
+  const diffWithoutWeekends = diffDays - totalWeekends;
+  return diffWithoutWeekends + 1; 
 }
 
 function ApplyLeave(props)
 {
+
     const [leave,setLeave]=useState({from:'',to:'',message:''});
     const navigate=useNavigate('') 
     const {user, isLoggedIn, login, logout} = useContext(AuthContext);
     const [grant,setGranted]=useState(0);
     const [pend,setPending]=useState(0);
     const [uiUpdate,setUiUpdate]=useState(0);
+    const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
+
+const firstDayOfMonth = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`;
+const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate();
+const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${lastDayOfMonth}`;
 
     function getLeaves()
     {
@@ -80,16 +88,13 @@ function ApplyLeave(props)
         toast.error('Description Cannot be Empty');
         else if(!event.target.elements.image.files[0])
         toast.error('Image file Cannot be Empty');
-
+        else if(checkWeekend(leave.from))
+          toast.error('From cant be  Weekend');
+        else if(checkWeekend(leave.to))
+          toast.error('To Date cannot be Weekend');
         else
         {
-        // const ob=
-        // {
-        //     empid:user.empid,
-        //     head:user.head,
-        //     status:'pending'
-        // }
-        //const obj={...leave,...ob};
+     
          axios.post(`${SERVER}/apply`,
            formData,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
@@ -108,6 +113,16 @@ function ApplyLeave(props)
         })
       
       }
+    }
+    function checkWeekend(val)
+    {
+     let temp=new Date(val);
+     temp=temp.getDay();
+     console.log(temp);
+     if(temp===0||temp===6)
+     return true;
+     else
+     return false;
     }
     
   
@@ -137,11 +152,13 @@ function ApplyLeave(props)
 <form onSubmit={submitHandle} encType='multipart/form-data'>
        <div class="form-group mt-5 " >
           <label for="from">From</label>
-           <input type="date" class="form-control mt-3 mb-4" id="from" name="from" value={leave.from} onChange={(e)=>setLeave({...leave,from:e.target.value})} ></input>
+           <input type="date" class="form-control mt-3 mb-4" id="from" name="from" value={leave.from} onChange={(e)=>setLeave({...leave,from:e.target.value})}  min={firstDayOfMonth} max={lastDayFormatted}
+></input>
       </div>
     <div class="form-group">
     <label for="to">To</label>
-    <input type="date" class="form-control mt-2 mb-3" id="to"  name="to"  value={leave.to} onChange={(e)=>setLeave({...leave,to:e.target.value})}></input>
+    <input type="date" class="form-control mt-2 mb-3" id="to"  name="to"  value={leave.to} onChange={(e)=>setLeave({...leave,to:e.target.value})}min={firstDayOfMonth}
+       max={lastDayOfMonth}></input>
     </div>
  
     <div class="form-group">

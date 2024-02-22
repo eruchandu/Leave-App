@@ -3,7 +3,6 @@ const { expect } = chai;
 import mongoose from 'mongoose';
 const { ValidationError } = mongoose.Error;
 import { leaveModel, userModel } from '../schema.js';
-
 describe('Testing Item model', () => {
   let sampleLeave,sampleLeave2;
   beforeEach(() => {
@@ -58,9 +57,7 @@ describe('Testing Item model', () => {
       expect(err.errors.empid).to.exist;
     }
   });
-  
 });
-
 describe('Testing Leave model', () => {
   let sampleLeave, sampleLeave2;
   beforeEach(() => {
@@ -82,7 +79,6 @@ describe('Testing Leave model', () => {
       status: 'pending'
     }
   });
-
   it('should throw an error due to missing fields', async () => {
     let item = new leaveModel();
     try {
@@ -97,7 +93,6 @@ describe('Testing Leave model', () => {
       expect(err.errors.image).to.exist;
     }
   });
-
   it('should not throw an error since all fields are provided', async () => {
     let item = new leaveModel(sampleLeave);
     try {
@@ -108,7 +103,6 @@ describe('Testing Leave model', () => {
       throw new Error('Validation succeeded unexpectedly');
     }
   });
-
   it('should throw an error since Empid is missing', async () => {
     let item = new leaveModel(sampleLeave2);
     try {

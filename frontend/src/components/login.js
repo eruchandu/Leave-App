@@ -46,14 +46,15 @@ function handleForgetClick(event)
 }
 
 return(
-     <div className='border border-5 w-50 mx-auto mt-5 pb-4 shadow'>
+     <div className='border border-5 w-50 mx-auto mt-5 pb-4 shadow rounded'>
+      <div className='login-form mx-auto w-75 mt-5 d-flex'>
+        <img src='../profile.svg' className='w-75 mx-auto'></img>
+      </div>
     <div className='login-form mx-auto w-75 mt-5 '>
        <form onSubmit={submitHandler}>
   <div class="form-group mt-5" >
     <label for="empid">Employee id</label>
     <input type="text" class="form-control mt-3 mb-4" id="empid" name="empid" onChange={(e)=>SetUser({...User,empid:e.target.value})} ></input>
-    
-    
   </div>
   <div class="form-group">
     <label for="Password">Password</label>
