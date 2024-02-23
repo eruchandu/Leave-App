@@ -1,0 +1,17 @@
+.circular-frame {
+    width: 130px; /* Adjust as needed */
+    height: 130px; /* Adjust as needed */
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    left:60%;
+    top: -85px; /* Half of the height */
+    /* transform: translateX(-50%); */
+  }
+  
+  .circular-frame img {
+    width: 75%;
+    height: auto;
+  }
+  
+  

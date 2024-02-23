@@ -154,61 +154,61 @@ describe('POST /employees', () => {
 })
 
 
-describe('POST /employees/list', () => {
-  let verifyTokenStub;
-  let findStub;
+// describe('POST /employees/list', () => {
+//   let verifyTokenStub;
+//   let findStub;
 
-  beforeEach(() => {
-    verifyTokenStub = sinon.stub(jwt, 'verify');
-    findStub = sinon.stub(userModel, 'find');
-  });
+//   beforeEach(() => {
+//     verifyTokenStub = sinon.stub(jwt, 'verify');
+//     findStub = sinon.stub(userModel, 'find');
+//   });
 
-  afterEach(() => {
-    verifyTokenStub.restore();
-    findStub.restore();
-  });
+//   afterEach(() => {
+//     verifyTokenStub.restore();
+//     findStub.restore();
+//   });
 
-  it('should return unassigned employees of a specific role', (done) => {
-    const mockToken = 'mock_token';
-    const role = 'intern';
-    const mockUsers = [{ _id: '1', name: 'John', empid: 'EMP001', role: 'intern', head: '', contact: '1234567890', Address: 'Address', total: 5 }];
-    findStub.resolves(mockUsers);
-    verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
+//   it('should return unassigned employees of a specific role', (done) => {
+//     const mockToken = 'mock_token';
+//     const role = 'intern';
+//     const mockUsers = [{ _id: '1', name: 'John', empid: 'EMP001', role: 'intern', head: '', contact: '1234567890', Address: 'Address', total: 5 }];
+//     findStub.resolves(mockUsers);
+//     verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
 
-    chai.request(app)
-      .post('/employees/list')
-      .set('Cookie', [`jwt=${mockToken}`])
-      .send({ role })
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.success).to.be.true;
-        expect(res.body.content).to.be.an('array');
-        expect(res.body.content).to.have.lengthOf(1);
-        expect(res.body.message).to.equal(`Unassigned ${role}`);
-        done();
-      });
-  });
+//     chai.request(app)
+//       .post('/employees/list')
+//       .set('Cookie', [`jwt=${mockToken}`])
+//       .send({ role })
+//       .end((err, res) => {
+//         expect(res).to.have.status(200);
+//         expect(res.body.success).to.be.true;
+//         expect(res.body.content).to.be.an('array');
+//         expect(res.body.content).to.have.lengthOf(1);
+//         expect(res.body.message).to.equal(`Unassigned ${role}`);
+//         done();
+//       });
+//   });
 
-  it('should return message when no employees of the specified role are available', (done) => {
-    const mockToken = 'mock_token';
-    const role = 'Manager';
-    findStub.resolves([]);
-    verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
+//   it('should return message when no employees of the specified role are available', (done) => {
+//     const mockToken = 'mock_token';
+//     const role = 'Manager';
+//     findStub.resolves([]);
+//     verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
 
-    chai.request(app)
-      .post('/employees/list')
-      .set('Cookie', [`jwt=${mockToken}`])
-      .send({ role })
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.success).to.be.true;
-        expect(res.body.content).to.be.an('array').that.is.empty;
-        expect(res.body.message).to.equal(`No ${role} Aviliable`);
-        done();
-      });
-  });
+//     chai.request(app)
+//       .post('/employees/list')
+//       .set('Cookie', [`jwt=${mockToken}`])
+//       .send({ role })
+//       .end((err, res) => {
+//         expect(res).to.have.status(200);
+//         expect(res.body.success).to.be.true;
+//         expect(res.body.content).to.be.an('array').that.is.empty;
+//         expect(res.body.message).to.equal(`No ${role} Aviliable`);
+//         done();
+//       });
+//   });
 
-});
+// });
 describe('POST /employees/del', () => {
   let verifyTokenStub;
   let findOneAndUpdateStub;

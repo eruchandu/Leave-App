@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha ./test/*.spec.js --exit",
     "start": "node server.js",
-    "coverage":"nyc --reporter=test npm run test"
+    "coverage": "nyc npm test"
   },
   "author": "",
   "license": "ISC",

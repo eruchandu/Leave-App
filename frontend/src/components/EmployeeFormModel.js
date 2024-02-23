@@ -8,7 +8,9 @@ function EmployeeFormModal({ employee, onClose }) {
     role: employee.role,
     contact: employee.contact,
     Address: employee.Address,
-    total:employee.total
+    total:employee.total,
+    image:employee.photo,
+    empid:employee.empid,
   });
 
   const handleChange = (e) => {
@@ -33,28 +35,26 @@ function EmployeeFormModal({ employee, onClose }) {
       <div className="modal-dialog" style={{ margin: '10% auto', maxWidth: 600 }}>
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Edit Employee Details</h5>
-            <button type="button" className="close" onClick={onClose}>&times;</button>
+            <h5 className="modal-title">Update Employee Details</h5>
+            <button type="button" className="close btn btn-danger " onClick={onClose}>&times;</button>
           </div>
           <div className="modal-body">
+          <div className="row d-flex">
+            
+        <div className="col-sm-6 w-75 d-block mx-auto">
+
+          <h6><strong>Name:</strong> &nbsp;&nbsp;&nbsp; {formData.name}</h6>
+          <h6><strong>Empid:</strong> &nbsp;&nbsp;&nbsp;   {formData.empid}</h6>
+          <h6><strong>Contact:</strong> &nbsp;&nbsp;&nbsp;   {formData.contact}</h6>
+        </div>
+      </div>
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label htmlFor="name">Name</label>
-                <input type="text" className="form-control" id="name" name="name" value={formData.name} onChange={handleChange} />
-              </div>
-              <div className="form-group">
+              
+              <div className="form-group w-75 mx-auto">
                 <label htmlFor="role">Role</label>
                 <input type="text" className="form-control" id="role" name="role" value={formData.role} onChange={handleChange} />
               </div>
-              <div className="form-group">
-                <label htmlFor="contact">Contact</label>
-                <input type="text" className="form-control" id="contact" name="contact" value={formData.contact} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="Address">Address</label>
-                <input type="text" className="form-control" id="Address" name="Address" value={formData.Address} onChange={handleChange} />
-              </div>
-              <div className="form-group">
+              <div className="form-group w-75 mx-auto">
                 <label htmlFor="total">Total Leaves</label>
                 <input type="number" className="form-control" id="total" name="total" value={formData.total} onChange={handleChange} />
               </div>

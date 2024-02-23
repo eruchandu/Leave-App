@@ -251,7 +251,11 @@ app.post('/employees/add',verifyToken,async(req,res)=>{
 
   const{empid,name,role,head}=req.body
   const emp=await userModel.findOne({empid:empid});
-  if(emp.head!=="")
+  if(!emp)
+  {
+    res.send({success:false,message:`Please Check Employee ID`});
+  }
+  else if(emp.head!=="")
   {
     res.send({success:false,message:`${name} is Assigned to ${head}`})
   }
@@ -270,7 +274,7 @@ app.post('/employees/:id',verifyToken,(req,res)=>{
   const {name,role,contact,Address,total}=req.body;
   userModel.findOneAndUpdate(
     { empid: req.params.id }, 
-    { $set: {name: name,role:role,contact:contact,Address:Address,total:total} }, 
+    { $set: {role:role,total:total} }, 
     { new: true } 
   )
   .then(async(updatedLeave) => {console.log(updatedLeave)})
@@ -445,6 +449,29 @@ function daysDifference(date1, date2)
   const diffWithoutWeekends = diffDays - totalWeekends;
   return diffWithoutWeekends + 1; 
 }
+app.post('/user',verifyToken,async(req,res)=>{
+ console.log("user route called in APi");
+  const {empid}=req.body;
+  let result=await userModel.findOne({empid});
+  console.log("result of user route ",result);
+  if(result)
+  res.send({success:true,content:result});
+  else
+  res.send({success:false,content:[]});
+
+})
+app.post('/user/update/',verifyToken,addItemMiddleWare,async(req,res)=>{
+  
+  
+   const {name,mail,Address,contact,empid}=req.body;
+   const link = await uploadImage({imageName : req.file.filename, imagePath : req.file.path})
+   let result=await userModel.findOneAndUpdate({empid:empid},{$set:{mail:mail,name:name,Address:Address,contact:contact,photo:link}});
+   console.log("result of user route ",result);
+   if(result)
+   res.send({success:true,content:result});
+   else
+   res.send({success:false,content:[]});
+ })
 app.use((_,res)=>{
   res.sendFile(`${__dirname}/public/index.html`)
 })
@@ -470,5 +497,11 @@ app.listen(process.env.PORT,(req,res)=>
 {
     console.log(`server started at${process.env.PORT}` );
  })
+ async function updatephoto()
+ {
+  await userModel.updateMany({},{photo:"https://third-1316.s3.ap-south-1.amazonaws.com/1708619947621-undraw_Coding_re_iv62.png"});
+  console.log("phtos updated ");
 
+ }
+//updatephoto();
 export default app;

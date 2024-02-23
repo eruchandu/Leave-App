@@ -16,6 +16,8 @@ function Home(){
           Explore our services and empower your organization with efficient HR
           solutions.
         </p>
+      
+
       </div>
       )
 }

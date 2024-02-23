@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema({
     {
         type:Number,
         required:true
+    },
+    photo:{
+        type:String,
+        required:true
     }
    
 });
