@@ -4,9 +4,8 @@
     border-radius: 50%;
     overflow: hidden;
     position: absolute;
-    left:60%;
-    top: -85px; /* Half of the height */
-    /* transform: translateX(-50%); */
+    top: -85px; 
+    z-index: 1;
   }
   
   .circular-frame img {
@@ -14,4 +13,6 @@
     height: auto;
   }
   
-  
+  .edit{
+    z-index: 2;
+  }

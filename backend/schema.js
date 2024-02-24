@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+
 const userSchema = new mongoose.Schema({
     empid: {
         type: String,
@@ -87,7 +88,11 @@ const leaveSchema = new mongoose.Schema({
     },
     image:{
         type:String,
-        required:true,
+        required:true
+    },
+    days:{
+        type:Number,
+        required:true
     }
 });
 

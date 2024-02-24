@@ -46,11 +46,11 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
            }
            else if(resp.data.success)
            {
-            console.log("front end",resp.data.content);
+          //  console.log("front end",resp.data.content);
             setGranted(resp.data.content[0]?.granted);
             setPending(resp.data.content[0]?.pending);
             setUiUpdate(resp.data.content[0]?.pending);
-            console.log(user.total,pend,grant);
+         //console.log(user.total,pend,grant);
            }
            
         })
@@ -63,6 +63,8 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
     async function submitHandle(event)
     {
         event.preventDefault();
+        const diff=daysDifference(leave.from,leave.to)
+        console.log(diff);
         const formData = new FormData();
         formData.append('from', leave.from);
         formData.append('to', leave.to);
@@ -71,10 +73,9 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
         formData.append('empid',user.empid);
         formData.append('head',user.head);
         formData.append('status','pending');
+        formData.append('days',diff);
         const days=pend+grant;
         console.log("Hold = ",days);
-        const diff=daysDifference(leave.from,leave.to)
-        console.log(diff);
         console.log("leaves ==== ",leave);
         if(leave.from>leave.to)
           toast.error("To Date Cannot be before from Date");
@@ -106,8 +107,7 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
             console.log(resp.data.message);
             toast.success(` ${resp.data.message}`);
             setUiUpdate(uiUpdate+1);
-            setLeave({ from: '', to: '', message: '' ,file:''});
-
+            setLeave({ from: '', to: '', message: '' ,image:''});
            }
            
         })
@@ -124,9 +124,6 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
      else
      return false;
     }
-    
-  
-    
     return(
 <div >
 

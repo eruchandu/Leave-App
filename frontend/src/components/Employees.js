@@ -5,6 +5,8 @@ import EmployeeFormModal from './EmployeeFormModel.js'
 import axios from 'axios'
 import '../css/Employee.css'
 import SERVER from '../applink.js'
+import { RiEdit2Line } from "react-icons/ri";
+import { RiDeleteBin5Line } from "react-icons/ri";
 function Employees()
 {
    
@@ -54,7 +56,6 @@ function Employees()
                         {console.log("Checking",item)}
                         
                             <div className="card-body">
-                            
                                 <h5 className="card-title">Emp ID: {item.empid}</h5>
                                 <p className="card-text">Name: {item.name}</p>
                                 <p className="card-text">Role {item.role}</p>
@@ -64,8 +65,10 @@ function Employees()
                             </div>
                           
                         </div>
-                        <button key={item.empid} className='btn btn-secondary mt-2 mx-2' onClick={() => handleEditClick(item)}> Edit </button>
-                        <button key={item.empid} className='btn btn-danger mt-2 mx-2' onClick={() => handleDelete(item)}>Remove</button>
+                        <div className='mt-1 d-flex justify-content-around'>
+                        <button key={item.empid} className='btn btn-secondary  mx-2' onClick={() => handleEditClick(item)}> <RiEdit2Line/> </button>
+                        <button key={item.empid} className='btn btn-danger  mx-2' onClick={() => handleDelete(item)}><RiDeleteBin5Line/></button>
+                        </div>
                     </div>
                     )
 

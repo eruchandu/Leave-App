@@ -38,14 +38,16 @@ useEffect(()=>{
       <div className="d-flex mt-2">
   <div className="container d-flex">
     <div className="profile-container border border-2 w-50 mx-2">
-      <div className="w-50 position-relative d-flex">
+      <div className="w-50 position-relative d-flex mx-auto">
 
         <div className="circular-frame border border-2 border-dark  mx-auto">
           <img  style={{objectFit:"cover"}}src={userData.photo} className="w-100 h-100" alt="User Profile" />
         </div>
         
       </div>
-      <button  className='btn mt-2 d-block ms-auto' onClick={() => handleEditClick()}><CiEdit/></button>
+      <div className="d-block ms-3">
+      <button  className='btn mt-2 d-block ms-5 edit' onClick={() => handleEditClick()}><CiEdit/></button>
+      </div>
       <h1 className="text-center mb-3 mt-5">User Profile</h1>
       <div className="row">
         <div className="col-sm-6 w-75 mx-auto">

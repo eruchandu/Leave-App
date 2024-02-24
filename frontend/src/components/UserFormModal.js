@@ -1,7 +1,7 @@
 import {React,useState} from 'react'
 import axios from 'axios';
 import SERVER from '../applink';
-function UserForModal({employee,onClose})
+function UserFormModal({employee,onClose})
 {
     console.log("paramter data ",employee);
     const [fData, setFormData] = useState({
@@ -79,4 +79,4 @@ async function handleSubmit(event)
   </div>
 )
 }
-export default UserForModal;
+export default UserFormModal;

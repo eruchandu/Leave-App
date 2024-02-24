@@ -98,7 +98,8 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
     head:req.body.head,
     status:req.body.status,
   empid:req.body.empid,
-  image:link
+  image:link,
+  days:req.body.days
 }
 
 leaveModel.aggregate([
@@ -292,7 +293,8 @@ app.post('/leaves',verifyToken,async(req,res)=>{
         message: leave.message,
         empid: leave.empid,
         head: leave.head,
-        status: leave.status
+        status: leave.status,
+        days:leave.days
       }));
       res.send({success:true,content:extractedLeaves})
     })
