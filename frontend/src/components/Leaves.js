@@ -7,11 +7,14 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Leaves.css'
 import SERVER from '../applink.js'
+import LeaveModal from './leaveModal.js';
 import { RiDeleteBin5Fill } from "react-icons/ri";
 function Leaves(props)
 {
     const { user, isLoggedIn, login, logout} = useContext(AuthContext);
     const [leaves,setLeaves]=useState([]);
+    const [leaveDetails,setDetails]=useState({});
+    const [showModal, setShowModal] = useState(false);
     
     async function getData(){
         let res=await axios.post(`${SERVER}/leaves`,user,{ withCredentials: true })
@@ -28,6 +31,31 @@ function Leaves(props)
            getData();
           // console.log("leaves after deleting",leaves,res.data.success);
       }
+      async  function  displayDetails(item)
+      {
+        const obj=
+        {empid:item.empid};
+        let leaveObj={...item};
+        axios.post(`${SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
+             if(resp.data.success==false)
+             {
+             toast.error(resp.data.message);
+             }
+             else if(resp.data.success)
+             {
+              leaveObj.granted=resp.data.content[0]?.granted
+              leaveObj.pending=resp.data.content[0]?.pending;
+              leaveObj.total=resp.data.content[0]?.total;
+              leaveObj.name=resp.data.content[0]?.name;
+              setDetails(leaveObj);
+              setShowModal(true);
+             }
+          })
+      }
+   const handleCloseModal = () =>
+    {
+        setShowModal(false);
+     };
     return(
          <div className="container">
             <h1 className="mt-5"> Leaves </h1>
@@ -38,7 +66,7 @@ function Leaves(props)
                  <div key={ind} className="col-md-4 col-sm-6 col-lg-3 Leave-card mt-3">
                      {console.log(item)}
                         <div className="card mb-4 shadow-sm">
-                            <div className="card-body">
+                            <div className="card-body leaves "onClick={()=>{displayDetails(item)}}>
                                 <h5 className="card-title">Emp ID: {item.empid}</h5>
                                 <p className="card-text">Status: {item.status}</p>
                                 <p className="card-text">From: {item.from}</p>
@@ -51,8 +79,11 @@ function Leaves(props)
                         </div>
                         {item.status=='pending'&&<button className='btn btn-danger mx-auto d-block' onClick={()=>{delleave(item)}}><RiDeleteBin5Fill/></button>}
                     </div>)})}
-                    
             </div>
+            {showModal && (
+        <LeaveModal leaveDetails={leaveDetails} onClose={handleCloseModal} />
+      )}
+    
         </div>)
       
 }

@@ -70,7 +70,7 @@ import { FaFileCircleXmark } from "react-icons/fa6";
                 {approvals?.map((item, ind) => (
                     <div key={ind} className="col-md-4 col-sm-6 col-lg-3 approval">  
                         <div className="card mb-4 shadow-sm ">
-                            <div className="card-body" onClick={()=>displayDetails(item)}>
+                            <div className="card-body leaves" onClick={()=>displayDetails(item)}>
                                 <h5 className="card-title">Emp ID: {item.empid}</h5>
                                 <p className="card-text">Status: {item.status}</p>
                                 <p className="card-text">From: {item.from}</p>

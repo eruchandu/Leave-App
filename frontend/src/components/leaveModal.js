@@ -25,6 +25,7 @@ function leaveModal({leaveDetails,onClose})
         </div>
         <h6><strong>Message:</strong> &nbsp;   {leaveDetails.message}</h6>
         {leaveDetails.days&&<h6><strong>No fo Days :</strong> &nbsp;{leaveDetails.days}</h6>}
+        {leaveDetails.status&&<h6><strong>Status :</strong> &nbsp;{leaveDetails.status}</h6>}
         <div className='d-flex justify-content-between mb-3'>
         <span><strong>Total:</strong> &nbsp;   {leaveDetails.total}</span>
         <span><strong>Granted:</strong> &nbsp; {leaveDetails.granted}</span>

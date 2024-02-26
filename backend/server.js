@@ -294,7 +294,8 @@ app.post('/leaves',verifyToken,async(req,res)=>{
         empid: leave.empid,
         head: leave.head,
         status: leave.status,
-        days:leave.days
+        days:leave.days,
+        image:leave.image
       }));
       res.send({success:true,content:extractedLeaves})
     })
