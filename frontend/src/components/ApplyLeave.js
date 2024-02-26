@@ -125,24 +125,28 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
      return false;
     }
     return(
-<div >
+<div  className=''>
+    <div className="container apply-leave-dashboard d-sm-flex justify-content-center mt-3">
 
-  <div className="container d-flex justify-content-between">
-      <div className="leave-info ">
-        <h1>Total </h1> 
-        <div className="d-flex justify-content-between">
-        <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{user.total}</h2>
+          <div className="leave-info mt-2 ">
+            <h1>Total </h1> 
+            <div className="d-flex justify-content-center">
+            <h2>{user.total}</h2>
+            </div>
+          </div>
+          <div className="leave-info mt-2">
+            <h1>Granted </h1> 
+            <div className="d-flex justify-content-center">
+            <h2>{grant}</h2>
+            </div>
+          </div>
+          <div className="leave-info mt-2">
+        <h1>Pending </h1> 
+          <div className="d-flex justify-content-center">
+          <h2>{pend}</h2>
         </div>
-      </div>
-      <div className="leave-info ">
-        <h1>Granted </h1> <h2>&nbsp;&nbsp;{grant} </h2> 
-      </div>
-      <div className="leave-info ">
-        <h1>Pending  </h1>
-        <h2> &nbsp;&nbsp;&nbsp;{pend}</h2>
-      </div>
-  
-  </div>
+    </div>
+    </div>
     <div className='border border-2  mt-5 pb-5'>
     <div className='login-form mx-auto mt-5 '>
     <h1 > Apply Leave </h1>

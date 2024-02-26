@@ -1,11 +1,20 @@
 .circular-frame {
-    width: 130px; /* Adjust as needed */
-    height: 130px; /* Adjust as needed */
-    border-radius: 50%;
+    /* width: 130px; 
+    height: 130px; 
+    border-radius: 50% !important;
     overflow: hidden;
     position: absolute;
     top: -85px; 
-    z-index: 1;
+    right:50%;
+    z-index: 1; */
+    position: absolute;
+    top:-50px;
+    left:40%;
+    width: 100px;
+    height: 100px;
+    border-radius: 50% !important;
+    overflow: hidden;
+
   }
   
   .circular-frame img {

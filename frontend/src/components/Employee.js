@@ -41,7 +41,7 @@ const [activeTab, setActiveTab] = useState('profile'); // Default active tab is 
   return (
     <div className="container  mt-5">
       <div className="row">
-        <div className="col-md-3 sidebar">
+        <div className="col-md-3 sidebar mb-5">
           <div className="list-group ms-2">
             <button 
               className={` list-group-item list-group-item-action ${
@@ -74,14 +74,7 @@ const [activeTab, setActiveTab] = useState('profile'); // Default active tab is 
             >
               <FcAcceptDatabase className='me-2'/>Approvals
             </button>}
-            {/* {user.isManager && <button
-              className={`list-group-item list-group-item-action ${
-                (activeTab === 'employee' || activeTab === 'employees' || activeTab === 'addEmployee') && 'active'
-                }`}
-              onClick={() => handleTabClick('employee')}
-            >
-              Management
-            </button>} */}
+            
             { user.isManager && <div>
               <button
                 className={`btn list-group-item list-group-item-action ${
@@ -92,7 +85,7 @@ const [activeTab, setActiveTab] = useState('profile'); // Default active tab is 
                <PiUsersThreeBold className='me-2'/> Employees
               </button>
               <button
-                className={`btn btn-secondary list-group-item list-group-item-action ${
+                className={`btn list-group-item list-group-item-action ${
                   activeTab === 'addEmployee' && 'active'
                   }`}
                 onClick={() => handleTabClick('addEmployee')}

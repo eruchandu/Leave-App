@@ -36,32 +36,29 @@ useEffect(()=>{
     
     return(
       <div className="d-flex mt-2">
-  <div className="container d-flex">
-    <div className="profile-container border border-2 w-50 mx-2">
-      <div className="w-50 position-relative d-flex mx-auto">
-
-        <div className="circular-frame border border-2 border-dark  mx-auto">
+  <div className="container d-md-flex">
+    <div className="profile-container border w-md-50 w-100 border-2 mx-2 position-relative">
+   
+        <div className="circular-frame border border-2 border-dark">
           <img  style={{objectFit:"cover"}}src={userData.photo} className="w-100 h-100" alt="User Profile" />
         </div>
-        
-      </div>
-      <div className="d-block ms-3">
-      <button  className='btn mt-2 d-block ms-5 edit' onClick={() => handleEditClick()}><CiEdit/></button>
-      </div>
-      <h1 className="text-center mb-3 mt-5">User Profile</h1>
-      <div className="row">
-        <div className="col-sm-6 w-75 mx-auto">
-          <h6><strong>Name  &nbsp;&nbsp;&nbsp;&nbsp;:</strong>&nbsp;&nbsp;{userData.name}</h6>
-          <h6><strong>Mail  :</strong> &nbsp;{userData.mail}</h6>
-          <h6><strong>Empid  &nbsp;&nbsp;&nbsp;:</strong>&nbsp;&nbsp;{userData.empid}</h6>
-          <h6><strong>Address&nbsp;:</strong> &nbsp;&nbsp;{userData.Address}</h6>
-          <h6><strong>Contact&nbsp; :</strong>&nbsp;&nbsp;{userData.contact}</h6>
-          <h6><strong>Role &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;:</strong> &nbsp;&nbsp;{userData.role}</h6>
+        <div className="d-block ms-3 mt-2">
+        <button  className='btn d-block mx-auto edit' onClick={() => handleEditClick()}><CiEdit/></button>
         </div>
-      </div>
+        <h4 className="text-center mb-3 mt-2 w-100">User Profile</h4>
+        <div className="row">
+          <div className="col-sm-6 w-75 mx-auto">
+            <h6 className="w-75"><strong>Name  :</strong>{userData.name}</h6>
+            <h6 className="w-75"><strong>Mail  :</strong> {userData.mail}</h6>
+            <h6 className="w-75"><strong>Empid  :</strong>{userData.empid}</h6>
+            <h6 className="w-75"><strong>Address :</strong>{userData.Address}</h6>
+            <h6 className="w-75"><strong>Contact :</strong>{userData.contact}</h6>
+            <h6 className="w-75"><strong>Role :</strong> {userData.role}</h6>
+          </div>
+        </div>
     </div>
    
-    <div className="image mt-5 d-flex align-items-center">
+    <div className="image mt-5 w-md-50 w-100 d-flex align-items-center">
       <img style={{objectFit:"center"}}src="../dashboard.svg"  className="w-75 d-block ms-auto"/>
     </div>
    
