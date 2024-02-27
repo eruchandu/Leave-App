@@ -51,9 +51,15 @@ function EmployeeFormModal({ employee, onClose }) {
             <form onSubmit={handleSubmit}>
               
               <div className="form-group w-75 mx-auto">
-                <label htmlFor="role">Role</label>
-                <input type="text" className="form-control" id="role" name="role" value={formData.role} onChange={handleChange} />
-              </div>
+            <label htmlFor="role">Role</label>
+            <select className="form-control w-100" id="role" name="role" value={formData.role} onChange={handleChange}>
+            <option disabled>{formData.role}</option>
+            <option value="Intern">Intern</option>
+                <option value="SDE-I">SDE-I</option>
+                <option value="SDE-II">SDE-II</option>
+                <option value="SDE-III">SDE-III</option>
+            </select>
+        </div>
               <div className="form-group w-75 mx-auto">
                 <label htmlFor="total">Total Leaves</label>
                 <input type="number" className="form-control" id="total" name="total" value={formData.total} onChange={handleChange} />

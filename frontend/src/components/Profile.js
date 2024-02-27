@@ -21,7 +21,7 @@ function Profile(props)
  async function getData()
     {
         console.log("get function called ");
-        let res=await axios.post(`${SERVER}/user`,userData,{ withCredentials: true })
+        let res=await axios.get(`${SERVER}/user/${user.empid}`,{ withCredentials: true })
         setUserData(res.data.content)
         console.log("verification in front end ",res.data.content);
   

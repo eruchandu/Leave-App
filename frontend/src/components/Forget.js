@@ -20,11 +20,7 @@ useEffect(()=>{},[displayuser,displayotp,displaypass])
     e.preventDefault();
     try 
     {
-      //console.log(user);
-      const obj={
-        empid:user
-      }
-      let response=await axios.post(`${SERVER}/forget/`,obj,{ withCredentials: true });  
+      let response=await axios.get(`${SERVER}/forget/${user}`,{ withCredentials: true });  
       if(response.data.success===true)
       {
         toast.success('OTP send Sucessfully');

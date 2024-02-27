@@ -19,7 +19,7 @@ import { FaFileCircleXmark } from "react-icons/fa6";
     const [showModal, setShowModal] = useState(false);
     async function getData()
     {
-        let res=await axios.post(`${SERVER}/approval`,user,{ withCredentials: true })
+        let res=await axios.get(`${SERVER}/approval/${user.empid}`,{ withCredentials: true })
          setApprovals(res.data.content);
     }
     useEffect(()=>{
@@ -39,10 +39,9 @@ import { FaFileCircleXmark } from "react-icons/fa6";
       }
      async  function  displayDetails(item)
       {
-        const obj=
-        {empid:item.empid};
+        
         let leaveObj={...item};
-        axios.post(`${SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
+        axios.get(`${SERVER}/getleaves/${item.empid}`,{ withCredentials: true }).then((resp)=>{
              if(resp.data.success==false)
              {
              toast.error(resp.data.message);

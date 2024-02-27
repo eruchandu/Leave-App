@@ -1,1 +1,20 @@
 Fronteend notes
+
+
+
+[
+    {
+        $unwind:"$item"
+    },
+    {
+        $addFeilds{
+        values:{$multiply:["$item.price","$item.xyz"]}
+         }
+    },
+    {
+        $group:{
+            _id:null,
+            Average:{$avg:"$values"}
+        }
+    } 
+]

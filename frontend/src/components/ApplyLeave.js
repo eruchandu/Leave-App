@@ -39,7 +39,7 @@ const lastDayFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '
     {
       const obj=
       {empid:user.empid}
-      axios.post(`${SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
+      axios.get(`${SERVER}/getleaves/${user.empid}`,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
            toast.error(resp.data.message);

@@ -144,23 +144,20 @@ leaveModel.aggregate([
 })
 
 
-app.post('/approval', verifyToken,async(req,res)=>{
-  const id=req.body.empid;
-  //console.log("Approvals called",id)
+app.get('/approval/:empid', verifyToken,async(req,res)=>{
+  const id=req.params.empid;
   const approvals=await leaveModel.find({head:id,status:'pending'})
-  //console.log("approvals",approvals);
   res.send({success:true,content:approvals})
 })
 
 
 
 app.post('/revoke',verifyToken,async (req,res)=>{
-  // console.log("revoke callled")
+ 
   const id=req.body.empid;
   const from=req.body.from;
   const to=req.body.to;
-  // const leaves=templeave.filter((item,ind)=>((!(item.empid==id&&item.status=='pending'&&item.from==from))&&item.empid==id))
-  //console.log("Server side Leaves",leaves);
+ 
   leaveModel.deleteOne({ empid: id, status: 'pending', from: from })
   .then(async (result) => {
     if (result.deletedCount > 0) 
@@ -187,10 +184,10 @@ app.post('/revoke',verifyToken,async (req,res)=>{
   })
   
   
-  app.post('/employees',verifyToken,async(req,res)=>{
-    const id=req.body.empid;
-    console.log("id   ",id);
-    if(Object.keys(req.body).length === 0)
+  app.get('/employees/:empid',verifyToken,async(req,res)=>{
+    const id=req.params.empid;
+    //console.log("id   ",id);
+    if(id===' ')
     {
       res.status(404).send({error:'Employee ID is required'});
     }
@@ -210,15 +207,14 @@ app.post('/revoke',verifyToken,async (req,res)=>{
         res.send({success:true,content:extractedUsers,message:'Employees of your team'})
       })
       .catch(error => {
-       
        console.error('Error fetching Users:', error);
        res.status(500).json({ error: 'Internal server error' });
      });
     }
  })
- app.post('/employees/del',verifyToken,async (req,res)=>{
-   const{empid}=req.body
-   if(Object.keys(req.body).length === 0)
+ app.delete('/employees/del/:empid',verifyToken,async (req,res)=>{
+   const empid=req.params.empid;
+   if(empid==='')
    {
     res.status(404).send({error:'Employee ID is required'});
    }
@@ -233,10 +229,9 @@ app.post('/revoke',verifyToken,async (req,res)=>{
   else
   res.send({sucess:false});
 }})
-app.post('/employees/list',verifyToken,(req,res)=>{
-  let {role}=req.body 
+app.get('/employees/list/:role',verifyToken,(req,res)=>{
+  let role=req.params.role;
   role=role.toLowerCase();
- // console.log(role);
  userModel.find({role:role,head:"",})
  .then(async(updatedUsers) => 
    {
@@ -245,11 +240,13 @@ app.post('/employees/list',verifyToken,(req,res)=>{
   else
   res.send({success:true,content:updatedUsers,message:`No ${role} Aviliable`});
    }
-  )
+  ).catch((err)=>{
+    console.log(err);
+    res.send({success:false,message:'Error in Displaying Employees'});
+  })
   
 })
 app.post('/employees/add',verifyToken,async(req,res)=>{
-
   const{empid,name,role,head}=req.body
   const emp=await userModel.findOne({empid:empid});
   if(!emp)
@@ -266,24 +263,34 @@ app.post('/employees/add',verifyToken,async(req,res)=>{
    { empid: empid }, 
    { $set: {head:head} }
  )
- .then(async(updatedUsers) => {console.log(updatedUsers)})
- res.send({success:true,message:`${name} Added to your Team `});
+ .then(async(updatedUsers) => {console.log(updatedUsers)
+  res.send({success:true,message:`${name} Added to your Team `});
+}).catch((err)=>{
+  console.log(err);
+  res.send({success:false,message:'Error in Adding Employee'})
+})
+ 
   }
 })
-app.post('/employees/:id',verifyToken,(req,res)=>{
+app.post('/employees/:id',verifyToken,async (req,res)=>{
 
-  const {name,role,contact,Address,total}=req.body;
-  userModel.findOneAndUpdate(
+  let {name,role,contact,Address,total}=req.body;
+  role=role.toLowerCase();
+    userModel.findOneAndUpdate(
     { empid: req.params.id }, 
     { $set: {role:role,total:total} }, 
     { new: true } 
   )
-  .then(async(updatedLeave) => {console.log(updatedLeave)})
-  res.send({success:true});
+  .then(async(updatedLeave) => {console.log(updatedLeave)
+  res.send({success:true})
+  }).catch((err)=>{
+    console.log(err);
+    res.send({success:false})
+  })
 })
 
-app.post('/leaves',verifyToken,async(req,res)=>{
- const id=req.body.empid;
+app.get('/leaves/:empid',verifyToken,async(req,res)=>{
+ const id=req.params.empid;
  leaveModel.find({ empid:id })
     .then(leaves => {
       const extractedLeaves = leaves.map(leave => ({
@@ -300,12 +307,11 @@ app.post('/leaves',verifyToken,async(req,res)=>{
       res.send({success:true,content:extractedLeaves})
     })
     .catch(error => {
-      //console.error('Error fetching leaves:', error);
       res.status(500).json({ error: 'Internal server error' });
     });
 })
-app.post('/getleaves',verifyToken,async(req,res)=>{
-  const {empid}=req.body;
+app.get('/getleaves/:empid',verifyToken,async(req,res)=>{
+  const empid=req.params.empid;
   let result=await userModel.find({empid:empid});
  //console.log("Result = ",result);
   res.send({success:true,message:"get leaves",content:result});
@@ -371,8 +377,9 @@ app.post('/approving', verifyToken ,async (req,res)=>{
   
 })
 
-app.post('/forget',async(req,res)=>{
-  const {empid}=req.body;
+app.get('/forget/:empid',async(req,res)=>{
+  
+  const empid=req.params.empid;
   console.log("Forget Route Called ",empid);
   let result=await userModel.findOne({empid:empid});
  // console.log(result);
@@ -452,9 +459,9 @@ function daysDifference(date1, date2)
   const diffWithoutWeekends = diffDays - totalWeekends;
   return diffWithoutWeekends + 1; 
 }
-app.post('/user',verifyToken,async(req,res)=>{
+app.get('/user/:empid',verifyToken,async(req,res)=>{
  console.log("user route called in APi");
-  const {empid}=req.body;
+  const empid=req.params.empid;
   let result=await userModel.findOne({empid});
   console.log("result of user route ",result);
   if(result)
@@ -478,11 +485,14 @@ app.post('/user/update/',verifyToken,addItemMiddleWare,async(req,res)=>{
 app.use((_,res)=>{
   res.sendFile(`${__dirname}/public/index.html`)
 })
+
+
 async function func2()
 {
   let res=await userModel.updateMany({},{$set:{total:20,pending:0,granted:0}});
   let temp=await leaveModel.deleteMany({});
 }
+
 //func2();
 function otpGenerator()
 {
@@ -507,4 +517,107 @@ app.listen(process.env.PORT,(req,res)=>
 
  }
 //updatephoto();
+
+async function mongoprac()
+{
+  
+  // let res=await leaveModel.aggregate([
+  // {
+  //   $match:{message:'Sick'}
+  // },
+  // {
+  //   $group:{
+  //     _id:"$empid",
+  //     "count":{$count:{}}
+  //   },
+  // },
+  // {
+  //   $count:"total employees"
+  // }
+  // ])
+
+
+  // let res=await leaveModel.aggregate([
+  //   {
+  //     $match:{
+  //       empid:'DBIN500'
+  //     }
+  //   },
+  //   {
+  //     $group:{
+  //       _id:null,
+  //       "Total Days":{
+  //         $sum:"$days"
+  //       },
+  //       "Total leaves ":{
+  //         $count:{}
+  //       }
+  //     }
+
+  //   }
+
+    
+  // ])
+
+  // let res=await userModel.aggregate([
+  //   {
+  //     $addFields:{
+  //       "sumofgranted":{
+  //         $sum:["$granted","$pending"]
+  //       }
+  //     }
+  //   },
+  //   {
+  //     $group:{
+  //       _id:"$role",
+  //       "sumbyrole":{
+  //         $sum:"$sumofgranted"
+  //       }
+  //     }
+  //    },
+  //   {
+  //     $sort:{"sumbyrole":-1}
+  //   },
+  //   {
+  //     $limit:2
+  //   }
+  // ])
+     
+  // console.log("Hello")
+  // var date=new Date('2024-02-01')
+  //  console.log(date,"   ",typeof date);
+  //  if(date<'2024-02-13')
+  //  console.log("Lesser");
+  // else
+  // console.log("greater");
+
+  // let res=await leaveModel.aggregate([
+  //   {
+  //     $match: {
+  //       $expr: {
+  //         $and: [
+  //           { $gte: ["$from", date] }, // Check if from date is greater than or equal to the specified date
+  //           { $lte: ["$to", date] }    // Check if to date is less than or equal to the specified date
+  //         ]
+  //       }
+  //     }
+  //   }
+  // ])
+var currentDate=new Date();
+var startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+startDate = startDate.toISOString().slice(0, 10); // Format as 'YYYY-MM-DD'
+
+// Get the ending day of the current month
+var endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+endDate = endDate.toISOString().slice(0, 10); 
+let res=await leaveModel.aggregate([
+  {
+    $match: {
+           $and:[{from:{$gte:startDate}},{to:{$lte:endDate}},{status:'pending'}]
+    }
+  }
+])
+  console.log("Result",res);
+}
+mongoprac();
 export default app;

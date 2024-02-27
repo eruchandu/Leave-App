@@ -17,7 +17,7 @@ function Leaves(props)
     const [showModal, setShowModal] = useState(false);
     
     async function getData(){
-        let res=await axios.post(`${SERVER}/leaves`,user,{ withCredentials: true })
+        let res=await axios.get(`${SERVER}/leaves/${user.empid}`,{ withCredentials: true })
          setLeaves(res.data.content)
     }
     useEffect(()=>{
@@ -33,10 +33,8 @@ function Leaves(props)
       }
       async  function  displayDetails(item)
       {
-        const obj=
-        {empid:item.empid};
         let leaveObj={...item};
-        axios.post(`${SERVER}/getleaves`,obj,{ withCredentials: true }).then((resp)=>{
+        axios.get(`${SERVER}/getleaves/${item.empid}`,{ withCredentials: true }).then((resp)=>{
              if(resp.data.success==false)
              {
              toast.error(resp.data.message);

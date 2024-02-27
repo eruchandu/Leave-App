@@ -41,12 +41,11 @@ function AddEmployee()
     async function submitHandleRole(event)
     {
         event.preventDefault();
-        const ob={
-            role:Role
-        }
+        // const ob={
+        //     role:Role
+        // }
         
-         axios.post(`${SERVER}/employees/list`,
-           ob,{ withCredentials: true }).then((resp)=>{
+         axios.get(`${SERVER}/employees/list/${Role}`,{ withCredentials: true }).then((resp)=>{
            if(resp.data.success==false)
            {
            toast.error(resp.data.message);
@@ -99,7 +98,6 @@ function AddEmployee()
             <select className="form-control mt-3 mb-4" id="Role" name="Role" value={Role} onChange={(e) => setRole(e.target.value)}>
                 <option value="">Select Role</option>
                 <option value="Intern">Intern</option>
-                <option value="Manager">Manager</option>
                 <option value="SDE-I">SDE-I</option>
                 <option value="SDE-II">SDE-II</option>
                 <option value="SDE-III">SDE-III</option>
