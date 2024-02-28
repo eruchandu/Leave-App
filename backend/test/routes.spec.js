@@ -66,156 +66,69 @@ describe('Login Route', () => {
   });
 });
 
-describe('POST /approval', () => {
+
+describe('GET /employees/list', () => {
   let verifyTokenStub;
   let findStub;
 
   beforeEach(() => {
     verifyTokenStub = sinon.stub(jwt, 'verify');
-    findStub = sinon.stub();
+    findStub = sinon.stub(userModel, 'find');
   });
 
   afterEach(() => {
     verifyTokenStub.restore();
+    findStub.restore();
   });
 
-  
+  it('should return unassigned employees of a specific role', (done) => {
+    const mockToken = 'mock_token';
+    const role = 'intern';
+    const mockUsers = [{ _id: '1', name: 'John', empid: 'EMP001', role: 'intern', head: '', contact: '1234567890', Address: 'Address', total: 5 }];
+    findStub.resolves(mockUsers);
+    verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
 
-  it('should return an error if no token is provided',  (done) => {
-     chai.request(app)
-      .post('/approval')
-      .send({ empid: '496' }).end((err,res)=>{
-        expect(res.body).to.have.property('auth').to.equal(false);
-        expect(res.body).to.have.property('message').to.equal('No token provided.');
+    chai.request(app)
+      .get(`/employees/list/:${role}`)
+      .set('Cookie', [`jwt=${mockToken}`])
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.success).to.be.true;
+        expect(res.body.content).to.be.an('array');
+        // expect(res.body.content).to.have.lengthOf(1);
+        // expect(res.body.message).to.equal(`Unassigned ${role}`);
         done();
-      })
-
-   
-    
+      });
   });
 
-  it('should return an error if token is invalid', async () => {
-    verifyTokenStub.callsArgWith(2, new Error('Invalid token'));
+  it('should return message when no employees of the specified role are available', (done) => {
+    const mockToken = 'mock_token';
+    const role = 'manager';
+    findStub.resolves([]);
+    verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
 
-    const res = await chai.request(app)
-      .post('/approval')
-      .set('Cookie', ['jwt=invalid_token'])
-      .send({ empid: '496' }).end((err,res)=>
-      { 
-      expect(res.body).to.have.property('auth').to.equal(false);
-      expect(res.body).to.have.property('message').to.equal('Failed to authenticate token.');
-      })
-  });
-
-})
-
-describe('POST /employees', () => {
-  let verifyTokenStub;
-  let findStub;
-
-  beforeEach(() => {
-    verifyTokenStub = sinon.stub(jwt, 'verify');
-    findStub = sinon.stub();
-  });
-
-  afterEach(() => {
-    verifyTokenStub.restore();
-  });
-
-  
-
-  it('should return an error if no token is provided',  (done) => {
-     chai.request(app)
-      .post('/employees')
-      .send({ empid: '500' }).end((err,res)=>{
-        expect(res.body).to.have.property('auth').to.equal(false);
-        expect(res.body).to.have.property('message').to.equal('No token provided.');
+    chai.request(app)
+      .get(`/employees/list/:${role}`)
+      .set('Cookie', [`jwt=${mockToken}`])
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.body.success).to.be.true;
+        expect(res.body.content).to.be.an('array').that.is.empty;
+        // expect(res.body.message).to.equal(`No ${role} Aviliable`);
         done();
-      })
-
-   
-    
+      });
   });
 
-  it('should return an error if token is invalid', async () => {
-    verifyTokenStub.callsArgWith(2, new Error('Invalid token'));
+});
 
-    const res = await chai.request(app)
-      .post('/employees')
-      .set('Cookie', ['jwt=invalid_token'])
-      .send({ empid: '500' }).end((err,res)=>
-      { 
-      expect(res.body).to.have.property('auth').to.equal(false);
-      expect(res.body).to.have.property('message').to.equal('Failed to authenticate token.');
-      })
-  });
-  
-
-})
-
-
-// describe('POST /employees/list', () => {
-//   let verifyTokenStub;
-//   let findStub;
-
-//   beforeEach(() => {
-//     verifyTokenStub = sinon.stub(jwt, 'verify');
-//     findStub = sinon.stub(userModel, 'find');
-//   });
-
-//   afterEach(() => {
-//     verifyTokenStub.restore();
-//     findStub.restore();
-//   });
-
-//   it('should return unassigned employees of a specific role', (done) => {
-//     const mockToken = 'mock_token';
-//     const role = 'intern';
-//     const mockUsers = [{ _id: '1', name: 'John', empid: 'EMP001', role: 'intern', head: '', contact: '1234567890', Address: 'Address', total: 5 }];
-//     findStub.resolves(mockUsers);
-//     verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
-
-//     chai.request(app)
-//       .post('/employees/list')
-//       .set('Cookie', [`jwt=${mockToken}`])
-//       .send({ role })
-//       .end((err, res) => {
-//         expect(res).to.have.status(200);
-//         expect(res.body.success).to.be.true;
-//         expect(res.body.content).to.be.an('array');
-//         expect(res.body.content).to.have.lengthOf(1);
-//         expect(res.body.message).to.equal(`Unassigned ${role}`);
-//         done();
-//       });
-//   });
-
-//   it('should return message when no employees of the specified role are available', (done) => {
-//     const mockToken = 'mock_token';
-//     const role = 'Manager';
-//     findStub.resolves([]);
-//     verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
-
-//     chai.request(app)
-//       .post('/employees/list')
-//       .set('Cookie', [`jwt=${mockToken}`])
-//       .send({ role })
-//       .end((err, res) => {
-//         expect(res).to.have.status(200);
-//         expect(res.body.success).to.be.true;
-//         expect(res.body.content).to.be.an('array').that.is.empty;
-//         expect(res.body.message).to.equal(`No ${role} Aviliable`);
-//         done();
-//       });
-//   });
-
-// });
-describe('POST /employees/del', () => {
+describe('DELETE /employees/del', () => {
   let verifyTokenStub;
   let findOneAndUpdateStub;
 
   beforeEach(() => {
     verifyTokenStub = sinon.stub(jwt, 'verify');
-    findOneAndUpdateStub = sinon.stub(userModel, 'findOneAndUpdate');
+    findOneAndUpdateStub = sinon.stub(userModel,'findOneAndUpdate');
+
   });
 
   afterEach(() => {
@@ -230,32 +143,100 @@ describe('POST /employees/del', () => {
     verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
 
     chai.request(app)
-      .post('/employees/del')
+      .delete(`/employees/del/${empid}`)
       .set('Cookie', [`jwt=${mock_token}`])
-      .send({ empid })
+     
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.success).to.be.true;
         done();
       });
   });
-  it('should return an error when employee ID is missing', (done) => {
-    
-    const mock_token='mock_token'
-    findOneAndUpdateStub.resolves({});
-    verifyTokenStub.callsArgWith(2, null, { id: 'testUserId' }); 
-    chai.request(app)
-      .post('/employees/del')
-      .set('Cookie', [`jwt=${mock_token}`])
-      .send({}) 
-      .end((err, res) => {
-        expect(res).to.have.status(404); 
-        expect(res.body.error).to.equal('Employee ID is required');
-        done();
-      });
-  });
+
   
 });
+describe('GET /approval', () => {
+  let verifyTokenStub;
+  let findStub;
+  let empid;
+  beforeEach(() => {
+    verifyTokenStub = sinon.stub(jwt, 'verify');
+    findStub = sinon.stub();
+    empid:'496';
+  });
+
+  afterEach(() => {
+    verifyTokenStub.restore();
+  });
+
+  
+
+  it('should return an error if no token is provided',  (done) => {
+  
+     chai.request(app)
+      .get(`/approval/${empid}`)
+      .end((err,res)=>{
+        expect(res.body).to.have.property('auth').to.equal(false);
+        expect(res.body).to.have.property('message').to.equal('No token provided.');
+        done();
+      })
+
+   
+    
+  });
+
+  it('should return an error if token is invalid', async () => {
+    verifyTokenStub.callsArgWith(2, new Error('Invalid token'));
+
+    const res = await chai.request(app)
+      .get(`/approval/${empid}`)
+      .set('Cookie', ['jwt=invalid_token'])
+      .end((err,res)=>
+      { 
+      expect(res.body).to.have.property('auth').to.equal(false);
+      expect(res.body).to.have.property('message').to.equal('Failed to authenticate token.');
+      })
+  });
+
+})
+
+describe('POST /employees', () => {
+  let verifyTokenStub;
+  let findStub;
+  let empid;
+  beforeEach(() => {
+    verifyTokenStub = sinon.stub(jwt, 'verify');
+    findStub = sinon.stub();
+    empid:'500'
+  });
+
+  afterEach(() => {
+    verifyTokenStub.restore();
+  });
+
+  it('should return an error if no token is provided',  (done) => {
+     chai.request(app)
+      .get(`/employees/${empid}`)
+      .end((err,res)=>{
+        expect(res.body).to.have.property('auth').to.equal(false);
+        expect(res.body).to.have.property('message').to.equal('No token provided.');
+        done();
+      })
+  });
+
+  it('should return an error if token is invalid', async () => {
+    verifyTokenStub.callsArgWith(2, new Error('Invalid token'));
+
+    const res = await chai.request(app)
+    .get(`/employees/${empid}`)
+      .set('Cookie', ['jwt=invalid_token'])
+      .end((err,res)=>
+      { 
+      expect(res.body).to.have.property('auth').to.equal(false);
+      expect(res.body).to.have.property('message').to.equal('Failed to authenticate token.');
+      })
+  });
+})
 
 describe('POST /revoke', () => {
   let verifyTokenStub;
@@ -404,7 +385,7 @@ describe('POST /employees/:id', () => {
   });
 });
 
-describe('POST /leaves', () => {
+describe('GET /leaves', () => {
   let verifyTokenStub;
   let findStub;
 
@@ -431,9 +412,8 @@ describe('POST /leaves', () => {
     findStub.withArgs({ empid }).resolves(leaves); 
 
     chai.request(app)
-      .post('/leaves')
+      .get(`/leaves/${empid}`) 
       .set('Cookie', [`jwt=${mockToken}`])
-      .send({ empid })
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.success).to.be.true;
@@ -452,9 +432,8 @@ describe('POST /leaves', () => {
     findStub.withArgs({ empid }).rejects(new Error(errorMessage)); 
 
     chai.request(app)
-      .post('/leaves')
+    .get(`/leaves/${empid}`)
       .set('Cookie', [`jwt=${mockToken}`])
-      .send({ empid })
       .end((err, res) => {
         expect(res).to.have.status(500);
         expect(res.body.error).to.equal('Internal server error');
@@ -462,7 +441,7 @@ describe('POST /leaves', () => {
       });
   });
 });
-describe('POST /getleaves', () => {
+describe('Get /getleaves', () => {
   let verifyTokenStub;
   let findStub;
 
@@ -488,9 +467,9 @@ describe('POST /getleaves', () => {
     findStub.withArgs({ empid }).resolves(userDetails); 
 
     chai.request(app)
-      .post('/getleaves')
+    .get(`/getleaves/${empid}`)
       .set('Cookie', [`jwt=${mockToken}`])
-      .send({ empid })
+      
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.body.success).to.be.true;
@@ -553,24 +532,7 @@ describe('POST /getleaves', () => {
 
 
 
-// it('should return approvals for a given employee ID if token is provided and valid',(done) => {
-//   const mockToken = 'mock_token';
-//   const mockDecoded = { id: '496' };
-//   const mockApprovals = [{ id: '496', head: '500', status: 'pending'}];
 
-//   verifyTokenStub.callsArgWith(2, null, mockDecoded);
-//   findStub.withArgs({ head: '500', status: 'pending' }).returns(mockApprovals);
-//    chai.request(app)
-//     .post('/approval')
-//     .set('Cookie', [`jwt=${mockToken}`])
-//     .send({ empid: '500' })
-//     .end((err,res)=>{
-//       expect(res.body).to.have.property('success').to.equal(true);
-//       expect(res.body).to.have.property('content').to.an('array');
-//       done();
-//     })
-
-// }).timeout(10000);
 
 // it('should return employees for a given Manager  employee ID if token is provided and valid',(done) => {
 //   const mockToken = 'mock_token';

@@ -53,10 +53,24 @@
         mail:"chithanya.e@dariwnbox.io",
         role:"manager",
         salary:"100000",
-        password:"DBIN500",
+        password:"DBIN500", //hashed
         head:"",
         Address:"Hyderabad",
         contact:"9701652345",
         isManager:true,  
+        total:20,
+        pending:5,
+        granted:2
     }
+
 ]
+
+
+
+
+/*
+no.of managers
+print employees whose leaves are collideing
+print leaves in which leaves collide with specific period time(with start_date and end_date)
+print previously granted leave of a particular employee
+*/

@@ -19,7 +19,7 @@ function Employee()
 {
 const navigate=useNavigate('');
 const { user, isLoggedIn, login, logout } =useContext(AuthContext);
-const [activeTab, setActiveTab] = useState('profile'); // Default active tab is profile
+const [activeTab, setActiveTab] = useState('profile'); 
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -30,7 +30,7 @@ const [activeTab, setActiveTab] = useState('profile'); // Default active tab is 
  
   useEffect(() => {
     
-    console.log("Employee useeffect local",locallog,"context",isLoggedIn,"user",user,"Local user",localdata);
+    //console.log("Employee useeffect local",locallog,"context",isLoggedIn,"user",user,"Local user",localdata);
     if (!locallog) {
       navigate('/');
     }

@@ -55,6 +55,7 @@ export const verifyToken = (req, res, next) =>
   if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
   jwt.verify(token,`${process.env.SECRET_KEY}`, (err, decoded) => {
     if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    //console.log(decoded.id);
     req.userId = decoded.id;
     next();
   });
@@ -97,20 +98,23 @@ app.post('/apply',verifyToken,addItemMiddleWare, async (req,res)=>
     message:req.body.description,
     head:req.body.head,
     status:req.body.status,
-  empid:req.body.empid,
-  image:link,
-  days:req.body.days
+    empid:req.body.empid,
+    image:link,
+    days:req.body.days
 }
 
 leaveModel.aggregate([
   {
-    $match: {
-      empid: req.body.empid,
-      $or: [
+    $match: 
+    {
+      $and:[{empid: req.body.empid},
+      {status:{$ne:"Reject"}},
+      {$or: [
         { from: { $lte: req.body.from }, to: { $gte: req.body.from } },
         { from: { $lte: req.body.to }, to: { $gte: req.body.to } },
         {from:{$gte:req.body.from},to:{$lte:req.body.to}}
       ]
+      }]
     }
   },
   {
@@ -146,6 +150,7 @@ leaveModel.aggregate([
 
 app.get('/approval/:empid', verifyToken,async(req,res)=>{
   const id=req.params.empid;
+  console.log(req.userId);
   const approvals=await leaveModel.find({head:id,status:'pending'})
   res.send({success:true,content:approvals})
 })
@@ -214,12 +219,6 @@ app.post('/revoke',verifyToken,async (req,res)=>{
  })
  app.delete('/employees/del/:empid',verifyToken,async (req,res)=>{
    const empid=req.params.empid;
-   if(empid==='')
-   {
-    res.status(404).send({error:'Employee ID is required'});
-   }
-   else
-   {
   let result=await userModel.findOneAndUpdate(
     { empid: empid }, 
     { $set: {head:''} }
@@ -228,17 +227,22 @@ app.post('/revoke',verifyToken,async (req,res)=>{
   res.send({success:true});
   else
   res.send({sucess:false});
-}})
+})
 app.get('/employees/list/:role',verifyToken,(req,res)=>{
   let role=req.params.role;
   role=role.toLowerCase();
  userModel.find({role:role,head:"",})
  .then(async(updatedUsers) => 
    {
-  if(updatedUsers.length>0)
+  if(updatedUsers.length>0){
+    console.log("Aviliable ",updatedUsers);
   res.send({success:true,content:updatedUsers,message:`Unassigned ${role}`});
+  }
   else
+  {
+    console.log("Not aviliable",updatedUsers);
   res.send({success:true,content:updatedUsers,message:`No ${role} Aviliable`});
+  }
    }
   ).catch((err)=>{
     console.log(err);
@@ -339,16 +343,15 @@ app.post('/approving', verifyToken ,async (req,res)=>{
   )
   .then(async(updatedLeave) => {
     if (updatedLeave) {
-    //  //console.log('Leave document updated successfully:', updatedLeave);
-    //  console.log("Leave update",updatedLeave.from,"   ",updatedLeave.to)
+
      const diff=daysDifference(updatedLeave.from,updatedLeave.to);
-    // console.log(diff);
+   
      let obj={};
        if(message==='Grant')
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {granted: diff, pending: -diff }  },{ new: true } );
        else
        obj = await userModel.findOneAndUpdate( { empid: updatedLeave.empid },{$inc: {pending: -diff }  },{ new: true } );
-     // console.log("Updated Leave ",obj);
+     
       const mailOptions = {
         from: `${process.env.SEND_MAIL}`,
         to: `${process.env.RECIVE_MAIL}`,
@@ -382,7 +385,6 @@ app.get('/forget/:empid',async(req,res)=>{
   const empid=req.params.empid;
   console.log("Forget Route Called ",empid);
   let result=await userModel.findOne({empid:empid});
- // console.log(result);
   if(result)
   {
    let val=otpGenerator();
@@ -518,106 +520,5 @@ app.listen(process.env.PORT,(req,res)=>
  }
 //updatephoto();
 
-async function mongoprac()
-{
-  
-  // let res=await leaveModel.aggregate([
-  // {
-  //   $match:{message:'Sick'}
-  // },
-  // {
-  //   $group:{
-  //     _id:"$empid",
-  //     "count":{$count:{}}
-  //   },
-  // },
-  // {
-  //   $count:"total employees"
-  // }
-  // ])
 
-
-  // let res=await leaveModel.aggregate([
-  //   {
-  //     $match:{
-  //       empid:'DBIN500'
-  //     }
-  //   },
-  //   {
-  //     $group:{
-  //       _id:null,
-  //       "Total Days":{
-  //         $sum:"$days"
-  //       },
-  //       "Total leaves ":{
-  //         $count:{}
-  //       }
-  //     }
-
-  //   }
-
-    
-  // ])
-
-  // let res=await userModel.aggregate([
-  //   {
-  //     $addFields:{
-  //       "sumofgranted":{
-  //         $sum:["$granted","$pending"]
-  //       }
-  //     }
-  //   },
-  //   {
-  //     $group:{
-  //       _id:"$role",
-  //       "sumbyrole":{
-  //         $sum:"$sumofgranted"
-  //       }
-  //     }
-  //    },
-  //   {
-  //     $sort:{"sumbyrole":-1}
-  //   },
-  //   {
-  //     $limit:2
-  //   }
-  // ])
-     
-  // console.log("Hello")
-  // var date=new Date('2024-02-01')
-  //  console.log(date,"   ",typeof date);
-  //  if(date<'2024-02-13')
-  //  console.log("Lesser");
-  // else
-  // console.log("greater");
-
-  // let res=await leaveModel.aggregate([
-  //   {
-  //     $match: {
-  //       $expr: {
-  //         $and: [
-  //           { $gte: ["$from", date] }, // Check if from date is greater than or equal to the specified date
-  //           { $lte: ["$to", date] }    // Check if to date is less than or equal to the specified date
-  //         ]
-  //       }
-  //     }
-  //   }
-  // ])
-var currentDate=new Date();
-var startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-startDate = startDate.toISOString().slice(0, 10); // Format as 'YYYY-MM-DD'
-
-// Get the ending day of the current month
-var endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-endDate = endDate.toISOString().slice(0, 10); 
-let res=await leaveModel.aggregate([
-  {
-    $match: {
-           $and:[{from:{$gte:startDate}},{to:{$lte:endDate}},{status:'pending'}]
-    }
-  }
-])
-  console.log("Result",res);
-}
-mongoprac();
 export default app;

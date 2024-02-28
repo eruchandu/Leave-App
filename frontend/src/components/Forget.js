@@ -136,11 +136,11 @@ useEffect(()=>{},[displayuser,displayotp,displaypass])
                 <form onSubmit={handlePass}>
               <div className="form-group">
                 <label htmlFor="newpass">New Pass </label>
-                <input type="text" className="form-control" id="newpass" name="newpass" value={newpass} onChange={(e)=>{setNewPass(e.target.value)}} />
+                <input type="password" className="form-control" id="newpass" name="newpass" value={newpass} onChange={(e)=>{setNewPass(e.target.value)}} />
               </div>
               <div className="form-group">
                 <label htmlFor="confirmpass">Confirm Pass </label>
-                <input type="text" className="form-control" id="confirmpass" name="confirmpass" value={confirmpass} onChange={(e)=>{setConfirmPass(e.target.value)}} />
+                <input type="password" className="form-control" id="confirmpass" name="confirmpass" value={confirmpass} onChange={(e)=>{setConfirmPass(e.target.value)}} />
               </div>
               <button type="submit" className="btn btn-primary d-block mx-auto mt-3"> Save Password </button>
             </form> </div>)}
